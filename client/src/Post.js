@@ -3,7 +3,7 @@ import React, { Component } from 'react'
 class Post extends Component {
 	constructor(props) {
 		super(props)
-		this.state = { title: null, body: null }
+		this.state = { title: '', body: '' }
 
 		this.handleChange = this.handleChange.bind(this)
 		this.handleSubmit = this.handleSubmit.bind(this)
