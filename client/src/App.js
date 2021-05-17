@@ -1,10 +1,12 @@
 import React, { Component } from 'react'
 import PostContract from './contracts/Post.json'
+import { create } from 'ipfs-http-client'
 import getWeb3 from './getWeb3'
 import Post from './Post'
 
 import './App.css'
 
+const ipfs = create({ host: 'ipfs.infura.io', port: '5001', protocol: 'https' })
 class App extends Component {
 	state = {
 		web3: null,
@@ -14,6 +16,7 @@ class App extends Component {
 		postBody: null,
 		blockchainDataAuthor: null,
 		blockchainDataTitle: null,
+		blockchainDataBodyIpfsCID: null,
 		blockchainDataBody: null,
 		blockchainDataDate: null,
 		blockchainDataPostId: null,
@@ -48,7 +51,7 @@ class App extends Component {
 	}
 
 	readPostFromBlockchain = async () => {
-		let post = await this.state.contract.getPastEvents('PostCreated')
+		const post = await this.state.contract.getPastEvents('PostCreated')
 		const calculatedPostId = this.state.web3.utils.soliditySha3(
 			post[0]['returnValues']['_author'],
 			post[0]['returnValues']['_title'],
@@ -65,10 +68,20 @@ class App extends Component {
 		})
 		console.log(post)
 		console.log('postID from blockchain ', post[0]['returnValues']['_postId'])
+
+		const stream = await ipfs.cat(post[0]['returnValues']['_body'])
+		let bodyIpfsHashToString = ''
+		for await (const chunk of stream) {
+			// chunks of data are returned as a Buffer, convert it back to a string
+			chunk.map((l) => (bodyIpfsHashToString += String.fromCharCode(l)))
+		}
+		bodyIpfsHashToString = bodyIpfsHashToString
+
 		this.setState({
 			blockchainDataAuthor: post[0]['returnValues']['_author'],
 			blockchainDataTitle: post[0]['returnValues']['_title'],
-			blockchainDataBody: post[0]['returnValues']['_body'],
+			blockchainDataBodyIpfsCID: post[0]['returnValues']['_body'],
+			blockchainDataBody: bodyIpfsHashToString,
 			blockchainDataDate: post[0]['returnValues']['_date'],
 			blockchainDataPostId: post[0]['returnValues']['_postId'],
 		})
@@ -76,12 +89,22 @@ class App extends Component {
 
 	uploadPostToBlockchain = async (postTitle, postBody) => {
 		const { accounts, contract } = this.state
-		let author = accounts[0]
+		const author = accounts[0]
 		console.log('uploading to blockchain from author: ', author)
-		await contract.methods.createPost(postTitle, postBody).send({ from: author })
+		const postBodyToIpfsHash = await this.addToIpfsAndGetHash(postBody)
+		console.log(postBodyToIpfsHash)
+		await contract.methods.createPost(postTitle, postBodyToIpfsHash).send({ from: author })
 		//const response = await contract.methods.getPost().call()
 		//this.setState({ blockchainData: response })
 		this.readPostFromBlockchain()
+	}
+
+	addToIpfsAndGetHash = async (data) => {
+		const ifpsObj = await ipfs.add(data)
+		const ifpsHash = await ifpsObj.path
+		console.log('ipfs uploaded file hash:')
+		console.log(ifpsHash)
+		return ifpsHash
 	}
 
 	postHandler = (data) => {
@@ -107,6 +130,7 @@ class App extends Component {
 				<h2>Data from Blockchain:</h2>
 				<div>Post author: {this.state.blockchainDataAuthor}</div>
 				<div>Post title: {this.state.blockchainDataTitle}</div>
+				<div className='postBody'>Post body ID: {this.state.blockchainDataBodyIpfsCID}</div>
 				<div className='postBody'>Post body: {this.state.blockchainDataBody}</div>
 				<div>Post date: {this.state.blockchainDataDate}</div>
 				<div>Post ID: {this.state.blockchainDataPostId}</div>
