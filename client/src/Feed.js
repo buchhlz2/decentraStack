@@ -14,8 +14,10 @@ class Feed extends Component {
 			return (
 				<Article
 					article={article}
+					accounts={this.props.accounts}
 					subscribeToAuthor={this.props.subscribeToAuthor}
 					subscribedAuthors={this.props.subscribedAuthors}
+					unsubscribeFromAuthor={this.props.unsubscribeFromAuthor}
 					key={jsxKey}
 				/>
 			)

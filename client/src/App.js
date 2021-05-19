@@ -36,7 +36,7 @@ class App extends Component {
 			this.setState({ web3, accounts, contract: instance, ipfs }, async () => {
 				await this.getLatestArticles()
 			})
-			await this.getSusbcribedAuthors()
+			await this.getSubscribedAuthors()
 		} catch (error) {
 			// Catch any errors for any of the above operations.
 			alert(`Failed to load web3, accounts, or contract. Check console for details.`)
@@ -139,7 +139,21 @@ class App extends Component {
 		}
 	}
 
-	getSusbcribedAuthors = async () => {
+	unsubscribeFromAuthor = async (author) => {
+		try {
+			const { accounts, contract } = await this.state
+			const user = await accounts[0]
+			console.log(`User ${user} trying to unsubscribe from author ${author}`)
+			await contract.methods.unsubscribeFromAuthor(author).send({ from: user })
+			// TODO after calling, must check that it is successful; smart contract must
+			// implement this logic as well. Then, (un)subscribe btn & showing user is
+			// already subscribed to author can be rendered properly in UI
+		} catch (err) {
+			console.error(err)
+		}
+	}
+
+	getSubscribedAuthors = async () => {
 		try {
 			const { accounts, contract } = await this.state
 			const user = await accounts[0]
@@ -168,8 +182,10 @@ class App extends Component {
 				{this.state.articles.length > 0 ? (
 					<Feed
 						articles={this.state.articles}
+						accounts={this.state.accounts}
 						subscribeToAuthor={this.subscribeToAuthor}
 						subscribedAuthors={this.state.subscribedAuthors}
+						unsubscribeFromAuthor={this.unsubscribeFromAuthor}
 					/>
 				) : (
 					<div>No articles.</div>

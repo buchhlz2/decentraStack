@@ -13,19 +13,28 @@ const Article = (props) => {
 	return (
 		<div>
 			<ul>
-				<li>Post author: {props.article.author}</li>
-				<li>Post title: {props.article.title}</li>
-				<li>Post body ipfs CID: {props.article.body}</li>
-				<li className='postBody'>Post body: {props.article.bodyContent}</li>
-				<li>Post date: {props.article.date}</li>
-				<li>Post ID: {props.article.postId}</li>
+				<li>Title: {props.article.title}</li>
+				<li>Author: {props.article.author}</li>
+				<li>ipfs ID: {props.article.body}</li>
+				<li>Post blockchain ID: {props.article.postId}</li>
+				<li>Date: {props.article.date}</li>
+				<li>...</li>
 			</ul>
-			<SubscribeButton
-				author={props.article.author}
-				subscribeToAuthor={props.subscribeToAuthor}
-				subscribedAuthors={props.subscribedAuthors}
-				isSubscribed={isSubscribed}
-			/>
+			<div className='postBody'>
+				<p>{props.article.bodyContent}</p>
+			</div>
+			{props.accounts[0] === props.article.author ? (
+				<div></div>
+			) : (
+				<SubscribeButton
+					author={props.article.author}
+					subscribeToAuthor={props.subscribeToAuthor}
+					unsubscribeFromAuthor={props.unsubscribeFromAuthor}
+					subscribedAuthors={props.subscribedAuthors}
+					isSubscribed={isSubscribed}
+				/>
+			)}
+
 			<div>---</div>
 		</div>
 	)
