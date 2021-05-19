@@ -1,15 +1,15 @@
 import React, { Component } from 'react'
 
-class Post extends Component {
+class PostForm extends Component {
 	constructor(props) {
 		super(props)
-		this.state = { title: '', body: '' }
-
-		this.handleChange = this.handleChange.bind(this)
-		this.handleSubmit = this.handleSubmit.bind(this)
+		this.state = {
+			title: '',
+			body: '',
+		}
 	}
 
-	handleChange(event) {
+	handleChange = (event) => {
 		const value = event.target.value
 		this.setState({
 			...this.state,
@@ -17,7 +17,7 @@ class Post extends Component {
 		})
 	}
 
-	handleSubmit(event) {
+	handleSubmit = (event) => {
 		console.log('Data was submitted: ' + this.state.title + ' ' + this.state.body)
 		event.preventDefault()
 		this.props.uploadPostToBlockchain({ title: this.state.title, body: this.state.body })
@@ -43,4 +43,4 @@ class Post extends Component {
 	}
 }
 
-export default Post
+export default PostForm

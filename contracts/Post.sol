@@ -41,6 +41,10 @@ contract Post {
       return articles;
   }
 
+  function getUserToSubscribedAuthors(address _user) public view returns(address[] memory) {
+      return usersToSubscribedAuthors[_user];
+  }
+
   // subscribe to author
   function subscribeToAuthor(address _author) public {
     require(_author != address(0), 'Invalid author');

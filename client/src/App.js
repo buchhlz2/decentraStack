@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import PostContract from './contracts/Post.json'
 import { create } from 'ipfs-http-client'
 import { getWeb3Load, getWeb3Click } from './getWeb3'
-import Post from './Post'
+import PostForm from './PostForm'
 import Feed from './Feed'
 
 import './App.css'
@@ -14,6 +14,7 @@ class App extends Component {
 		accounts: null,
 		contract: null,
 		articles: [],
+		subscribedAuthors: null,
 	}
 
 	async componentDidMount() {
@@ -35,6 +36,7 @@ class App extends Component {
 			this.setState({ web3, accounts, contract: instance, ipfs }, async () => {
 				await this.getLatestArticles()
 			})
+			await this.getSusbcribedAuthors()
 		} catch (error) {
 			// Catch any errors for any of the above operations.
 			alert(`Failed to load web3, accounts, or contract. Check console for details.`)
@@ -43,6 +45,7 @@ class App extends Component {
 	}
 
 	connectWallet = async () => {
+		// TODO this needs to be fixed/refactored, along with `getWeb3Load`...better flow/usability needed
 		await getWeb3Click()
 	}
 
@@ -123,11 +126,31 @@ class App extends Component {
 	}
 
 	subscribeToAuthor = async (author) => {
-		const { accounts, contract } = await this.state
-		const user = await accounts[0]
-		console.log(`User ${user} trying to subscribe to author ${author}`)
-		await contract.methods.subscribeToAuthor(author).send({ from: user })
-		// TODO upon success, need to update state such that (un)subscribe can be rendered properly
+		try {
+			const { accounts, contract } = await this.state
+			const user = await accounts[0]
+			console.log(`User ${user} trying to subscribe to author ${author}`)
+			await contract.methods.subscribeToAuthor(author).send({ from: user })
+			// TODO after calling, must check that it is successful; smart contract must
+			// implement this logic as well. Then, (un)subscribe btn & showing user is
+			// already subscribed to author can be rendered properly in UI
+		} catch (err) {
+			console.error(err)
+		}
+	}
+
+	getSusbcribedAuthors = async () => {
+		try {
+			const { accounts, contract } = await this.state
+			const user = await accounts[0]
+			console.log(`User ${user} trying to get subscribed authors`)
+			const authors = await contract.methods.getUserToSubscribedAuthors(user).call()
+			console.log(authors)
+
+			this.setState({ subscribedAuthors: authors })
+		} catch (err) {
+			console.error(err)
+		}
 	}
 
 	render() {
@@ -140,10 +163,14 @@ class App extends Component {
 		}
 		return (
 			<div className='App'>
-				<Post uploadPostToBlockchain={this.uploadPostToBlockchain} />
+				<PostForm uploadPostToBlockchain={this.uploadPostToBlockchain} />
 				<div>---</div>
 				{this.state.articles.length > 0 ? (
-					<Feed articles={this.state.articles} subscribeToAuthor={this.subscribeToAuthor} />
+					<Feed
+						articles={this.state.articles}
+						subscribeToAuthor={this.subscribeToAuthor}
+						subscribedAuthors={this.state.subscribedAuthors}
+					/>
 				) : (
 					<div>No articles.</div>
 				)}

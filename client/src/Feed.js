@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
-import SubscribeButton from './SubscribeButton'
-class Post extends Component {
+import Article from './Article'
+class Feed extends Component {
 	state = {
 		articles: null,
 	}
@@ -12,16 +12,12 @@ class Post extends Component {
 		const formatArticles = this.props.articles.map((article) => {
 			jsxKey++
 			return (
-				<div key={jsxKey}>
-					<div>Post author: {article.author}</div>
-					<div>Post title: {article.title}</div>
-					<div>Post body ipfs CID: {article.body}</div>
-					<div className='postBody'>Post body: {article.bodyContent}</div>
-					<div>Post date: {article.date}</div>
-					<div>Post ID: {article.postId}</div>
-					<SubscribeButton author={article.author} subscribeToAuthor={this.props.subscribeToAuthor} />
-					<div>---</div>
-				</div>
+				<Article
+					article={article}
+					subscribeToAuthor={this.props.subscribeToAuthor}
+					subscribedAuthors={this.props.subscribedAuthors}
+					key={jsxKey}
+				/>
 			)
 		})
 
@@ -38,4 +34,4 @@ class Post extends Component {
 	}
 }
 
-export default Post
+export default Feed
