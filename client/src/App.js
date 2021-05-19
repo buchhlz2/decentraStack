@@ -1,15 +1,16 @@
 import React, { Component } from 'react'
 import PostContract from './contracts/Post.json'
 import { create } from 'ipfs-http-client'
-import getWeb3 from './getWeb3'
+import { getWeb3Load, getWeb3Click } from './getWeb3'
 import Post from './Post'
+import Feed from './Feed'
 
 import './App.css'
 
-const ipfs = create({ host: 'ipfs.infura.io', port: '5001', protocol: 'https' })
 class App extends Component {
 	state = {
 		web3: null,
+		ipfs: null,
 		accounts: null,
 		contract: null,
 		postTitle: null,
@@ -21,12 +22,14 @@ class App extends Component {
 		blockchainDataDate: null,
 		blockchainDataPostId: null,
 		calculatedPostId: null,
+		articles: [],
 	}
 
-	componentDidMount = async () => {
+	async componentDidMount() {
 		try {
 			// Get network provider and web3 instance.
-			const web3 = await getWeb3()
+			const web3 = await getWeb3Load()
+			const ipfs = create({ host: 'ipfs.infura.io', port: '5001', protocol: 'https' })
 
 			// Use web3 to get the user's accounts.
 			const accounts = await web3.eth.getAccounts()
@@ -38,7 +41,9 @@ class App extends Component {
 
 			// Set web3, accounts, and contract to the state, and then proceed with an
 			// example of interacting with the contract's methods.
-			this.setState({ web3, accounts, contract: instance })
+			this.setState({ web3, accounts, contract: instance, ipfs }, async () => {
+				await this.getLatestArticles()
+			})
 		} catch (error) {
 			// Catch any errors for any of the above operations.
 			alert(`Failed to load web3, accounts, or contract. Check console for details.`)
@@ -47,7 +52,27 @@ class App extends Component {
 	}
 
 	connectWallet = async () => {
-		await getWeb3()
+		await getWeb3Click()
+	}
+
+	async getLatestArticles() {
+		const latestArticles = await this.state.contract.methods.getArticles().call()
+		const articles = []
+		for await (const article of latestArticles) {
+			const stream = await this.state.ipfs.cat(article.body)
+
+			let ipfsCidToString = ''
+			for await (const chunk of stream) {
+				// chunks of data are returned as a Buffer, convert it back to a string
+				chunk.map((l) => (ipfsCidToString += String.fromCharCode(l)))
+			}
+			article.bodyContent = ipfsCidToString
+
+			articles.push(article)
+		}
+
+		articles.reverse()
+		this.setState({ articles })
 	}
 
 	readPostFromBlockchain = async () => {
@@ -69,13 +94,12 @@ class App extends Component {
 		console.log(post)
 		console.log('postID from blockchain ', post[0]['returnValues']['_postId'])
 
-		const stream = await ipfs.cat(post[0]['returnValues']['_body'])
+		const stream = await this.state.ipfs.cat(post[0]['returnValues']['_body'])
 		let bodyIpfsHashToString = ''
 		for await (const chunk of stream) {
 			// chunks of data are returned as a Buffer, convert it back to a string
 			chunk.map((l) => (bodyIpfsHashToString += String.fromCharCode(l)))
 		}
-		bodyIpfsHashToString = bodyIpfsHashToString
 
 		this.setState({
 			blockchainDataAuthor: post[0]['returnValues']['_author'],
@@ -100,7 +124,7 @@ class App extends Component {
 	}
 
 	addToIpfsAndGetHash = async (data) => {
-		const ifpsObj = await ipfs.add(data)
+		const ifpsObj = await this.state.ipfs.add(data)
 		const ifpsHash = await ifpsObj.path
 		console.log('ipfs uploaded file hash:')
 		console.log(ifpsHash)
@@ -124,7 +148,9 @@ class App extends Component {
 		return (
 			<div className='App'>
 				<Post postHandler={this.postHandler} />
-				<h2>Data from UI:</h2>
+				<div>---</div>
+				{this.state.articles.length > 0 ? <Feed articles={this.state.articles} /> : <div>No articles.</div>}
+				{/* <h2>Data from UI:</h2>
 				<div>Post title: {this.state.postTitle}</div>
 				<div className='postBody'>Post body: {this.state.postBody}</div>
 				<h2>Data from Blockchain:</h2>
@@ -135,7 +161,7 @@ class App extends Component {
 				<div>Post date: {this.state.blockchainDataDate}</div>
 				<div>Post ID: {this.state.blockchainDataPostId}</div>
 				<div>---</div>
-				<div>Calculated post ID: {this.state.calculatedPostId}</div>
+				<div>Calculated post ID: {this.state.calculatedPostId}</div> */}
 			</div>
 		)
 	}
