@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-
+import SubscribeButton from './SubscribeButton'
 class Post extends Component {
 	state = {
 		articles: null,
@@ -19,6 +19,7 @@ class Post extends Component {
 					<div className='postBody'>Post body: {article.bodyContent}</div>
 					<div>Post date: {article.date}</div>
 					<div>Post ID: {article.postId}</div>
+					<SubscribeButton author={article.author} subscribeToAuthor={this.props.subscribeToAuthor} />
 					<div>---</div>
 				</div>
 			)

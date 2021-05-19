@@ -13,15 +13,6 @@ class App extends Component {
 		ipfs: null,
 		accounts: null,
 		contract: null,
-		postTitle: null,
-		postBody: null,
-		blockchainDataAuthor: null,
-		blockchainDataTitle: null,
-		blockchainDataBodyIpfsCID: null,
-		blockchainDataBody: null,
-		blockchainDataDate: null,
-		blockchainDataPostId: null,
-		calculatedPostId: null,
 		articles: [],
 	}
 
@@ -75,6 +66,8 @@ class App extends Component {
 		this.setState({ articles })
 	}
 
+	// OLD CODE -- do not need but keeping in case want to reference
+	/*
 	readPostFromBlockchain = async () => {
 		const post = await this.state.contract.getPastEvents('PostCreated')
 		const calculatedPostId = this.state.web3.utils.soliditySha3(
@@ -84,10 +77,10 @@ class App extends Component {
 			post[0]['returnValues']['_date']
 		)
 		console.log('postID from js ', calculatedPostId)
-		/* TODO: query events by the `calculatedPostId` so that you can show only the post the was sent, not all events 
-    let queryPostById = await this.state.contract.getPastEvents('PostCreated').filter({ _postId: calculatedPostId })
-		console.log('queryPostById: ', queryPostById)
-    */
+		// TODO: query events by the `calculatedPostId` so that you can show only the post the was sent, not all events 
+        // let queryPostById = await this.state.contract.getPastEvents('PostCreated').filter({ _postId: calculatedPostId })
+		//console.log('queryPostById: ', queryPostById)
+
 		this.setState({
 			calculatedPostId,
 		})
@@ -109,18 +102,16 @@ class App extends Component {
 			blockchainDataDate: post[0]['returnValues']['_date'],
 			blockchainDataPostId: post[0]['returnValues']['_postId'],
 		})
-	}
+	}*/
 
-	uploadPostToBlockchain = async (postTitle, postBody) => {
+	uploadPostToBlockchain = async (data) => {
+		const { title, body } = data
 		const { accounts, contract } = this.state
 		const author = accounts[0]
 		console.log('uploading to blockchain from author: ', author)
-		const postBodyToIpfsHash = await this.addToIpfsAndGetHash(postBody)
+		const postBodyToIpfsHash = await this.addToIpfsAndGetHash(body)
 		console.log(postBodyToIpfsHash)
-		await contract.methods.createPost(postTitle, postBodyToIpfsHash).send({ from: author })
-		//const response = await contract.methods.getPost().call()
-		//this.setState({ blockchainData: response })
-		this.readPostFromBlockchain()
+		await contract.methods.createPost(title, postBodyToIpfsHash).send({ from: author })
 	}
 
 	addToIpfsAndGetHash = async (data) => {
@@ -131,10 +122,12 @@ class App extends Component {
 		return ifpsHash
 	}
 
-	postHandler = (data) => {
-		console.log('data from App.js', data)
-		this.setState({ postTitle: data.title, postBody: data.body })
-		this.uploadPostToBlockchain(data.title, data.body)
+	subscribeToAuthor = async (author) => {
+		const { accounts, contract } = await this.state
+		const user = await accounts[0]
+		console.log(`User ${user} trying to subscribe to author ${author}`)
+		await contract.methods.subscribeToAuthor(author).send({ from: user })
+		// TODO upon success, need to update state such that (un)subscribe can be rendered properly
 	}
 
 	render() {
@@ -147,21 +140,13 @@ class App extends Component {
 		}
 		return (
 			<div className='App'>
-				<Post postHandler={this.postHandler} />
+				<Post uploadPostToBlockchain={this.uploadPostToBlockchain} />
 				<div>---</div>
-				{this.state.articles.length > 0 ? <Feed articles={this.state.articles} /> : <div>No articles.</div>}
-				{/* <h2>Data from UI:</h2>
-				<div>Post title: {this.state.postTitle}</div>
-				<div className='postBody'>Post body: {this.state.postBody}</div>
-				<h2>Data from Blockchain:</h2>
-				<div>Post author: {this.state.blockchainDataAuthor}</div>
-				<div>Post title: {this.state.blockchainDataTitle}</div>
-				<div className='postBody'>Post body ID: {this.state.blockchainDataBodyIpfsCID}</div>
-				<div className='postBody'>Post body: {this.state.blockchainDataBody}</div>
-				<div>Post date: {this.state.blockchainDataDate}</div>
-				<div>Post ID: {this.state.blockchainDataPostId}</div>
-				<div>---</div>
-				<div>Calculated post ID: {this.state.calculatedPostId}</div> */}
+				{this.state.articles.length > 0 ? (
+					<Feed articles={this.state.articles} subscribeToAuthor={this.subscribeToAuthor} />
+				) : (
+					<div>No articles.</div>
+				)}
 			</div>
 		)
 	}

@@ -20,7 +20,7 @@ class Post extends Component {
 	handleSubmit(event) {
 		console.log('Data was submitted: ' + this.state.title + ' ' + this.state.body)
 		event.preventDefault()
-		this.props.postHandler({ title: this.state.title, body: this.state.body })
+		this.props.uploadPostToBlockchain({ title: this.state.title, body: this.state.body })
 	}
 
 	render() {

@@ -43,7 +43,8 @@ contract Post {
 
   // subscribe to author
   function subscribeToAuthor(address _author) public {
-    require(_author != address(0), 'Invalid _author');
+    require(_author != address(0), 'Invalid author');
+    require(_author != msg.sender, 'Author cannot subscribe to itself');
     bool alreadySubscribed = false;
     for(uint i = 0; i < usersToSubscribedAuthors[msg.sender].length; i++) {
       if(usersToSubscribedAuthors[msg.sender][i] == _author) {
