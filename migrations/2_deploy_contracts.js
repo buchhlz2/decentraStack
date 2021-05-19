@@ -1,4 +1,4 @@
-var PostContract = artifacts.require('./Post.sol')
+const PostContract = artifacts.require('./Post.sol')
 
 module.exports = function (deployer) {
 	deployer.deploy(PostContract)
