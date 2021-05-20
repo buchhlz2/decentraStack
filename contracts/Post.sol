@@ -23,6 +23,8 @@ contract Post {
   event UserUnsubscribedFromAuthor(address _follower, address _author);
 
   function createPost(string memory _title, string memory _body) public {
+    require(bytes(_title).length > 0, "Title must have a non-empty value");
+    require(bytes(_body).length > 0, "Body content must have a non-empty value");
     Article memory newArticle = Article({
       author: msg.sender,
       title: _title,

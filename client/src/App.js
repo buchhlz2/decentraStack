@@ -2,8 +2,8 @@ import React, { Component } from 'react'
 import PostContract from './contracts/Post.json'
 import { create } from 'ipfs-http-client'
 import { getWeb3Load, getWeb3Click } from './getWeb3'
-import PostForm from './PostForm'
-import Feed from './Feed'
+import PublishArticleForm from './PublishArticleForm'
+import ArticleFeed from './ArticleFeed'
 
 import './App.css'
 
@@ -176,11 +176,10 @@ class App extends Component {
 			)
 		}
 		return (
-			<div className='App'>
-				<PostForm uploadPostToBlockchain={this.uploadPostToBlockchain} />
-				<div>---</div>
+			<div className='container-fluid'>
+				<PublishArticleForm uploadPostToBlockchain={this.uploadPostToBlockchain} />
 				{this.state.articles.length > 0 ? (
-					<Feed
+					<ArticleFeed
 						articles={this.state.articles}
 						accounts={this.state.accounts}
 						subscribeToAuthor={this.subscribeToAuthor}

@@ -4,9 +4,13 @@ const SubscribeButton = (props) => {
 	return (
 		<div>
 			{props.isSubscribed ? (
-				<button onClick={() => props.unsubscribeFromAuthor(props.author)}>Unsubscribe</button>
+				<button className='btn btn-secondary btn-sm' onClick={() => props.unsubscribeFromAuthor(props.author)}>
+					Unsubscribe
+				</button>
 			) : (
-				<button onClick={() => props.subscribeToAuthor(props.author)}>Subscribe</button>
+				<button className='btn btn-secondary btn-sm' onClick={() => props.subscribeToAuthor(props.author)}>
+					Subscribe
+				</button>
 			)}
 		</div>
 	)
