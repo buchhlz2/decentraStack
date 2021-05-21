@@ -35,43 +35,42 @@ const PublishArticleForm = (props) => {
 
 	return (
 		<div className='container'>
-			<h2>Publish</h2>
 			<form onSubmit={handleSubmit}>
-				<div className='mb-3 input-group'>
-					<span className='input-group-text' id='basic-addon1'>
-						Title
-					</span>
+				<div className='mb-3 input-group h1'>
 					<input
 						type='text'
 						name='title'
 						value={values.title}
 						onChange={handleChange}
 						id='publishArticleFormTitle'
-						className='form-control'
+						className='form-control no-focus no-input-border'
 						placeholder='Title...'
 						aria-label='Title'
 						required
 					/>
 				</div>
-				<div className='mb-3 input-group '>
-					<span className='input-group-text' id='basic-addon1'>
-						Content
-					</span>
-					<textarea
-						type='text'
-						name='body'
-						value={values.body}
-						onChange={handleChange}
-						id='publishArticleFormBody'
-						className='form-control'
-						placeholder='Content...'
-						aria-label='Content'
-						required
-					/>
+				<div id='publishAreaContainer'>
+					<div className='mb-3 input-group h5'>
+						<textarea
+							type='text'
+							name='body'
+							value={values.body}
+							onChange={handleChange}
+							className='form-control no-focus no-input-border'
+							id='publishTextarea'
+							placeholder='Write your thoughts...'
+							aria-label='Content'
+							required
+						/>
+					</div>
+					<button
+						type='submit'
+						className='btn btn-primary no-focus'
+						style={{ alignSelf: 'flex-end', position: 'absolute', bottom: 35 }}
+					>
+						Publish
+					</button>
 				</div>
-				<button type='submit' className='btn btn-primary' id='publishArticleFormSubmit'>
-					Submit
-				</button>
 			</form>
 		</div>
 	)

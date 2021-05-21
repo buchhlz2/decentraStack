@@ -2,6 +2,34 @@ body {
 	padding-top: 90px;
 }
 
+#publishAreaContainer {
+	flex-direction: column;
+	flex: 1;
+}
+
+#publishTextarea {
+	height: 75vh;
+}
+
+#spinner-parent {
+	margin-top: 20em;
+}
+
+.no-focus:focus {
+	outline: none !important;
+	border: none !important;
+	-webkit-box-shadow: none !important;
+	box-shadow: none !important;
+}
+
+.no-input-border {
+	border: none;
+	outline: none;
+	resize: none;
+	width: 100%;
+	font-size: inherit;
+}
+
 @media (min-width: 768px) {
 	body {
 		padding-top: 0;
@@ -62,11 +90,14 @@ body {
 	}
 }
 
+@media (max-width: 768px) {
+	#publishTextarea {
+		background-color: red;
+		height: 63vh;
+	}
+}
+
 .postBody {
 	white-space: pre-wrap;
 	text-align: justify;
-}
-
-#spinner-parent {
-	margin-top: 20em;
 }

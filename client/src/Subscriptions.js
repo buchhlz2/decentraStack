@@ -23,7 +23,7 @@ const Subscriptions = (props) => {
 	}, [props])
 
 	return (
-		<div className='container-fluid mt-4'>
+		<div className='container'>
 			{props.isLoading ? (
 				<div className='d-flex justify-content-center' id='spinner-parent'>
 					<div className='spinner-border' role='status' style={{ width: '3rem', height: '3rem' }}>
