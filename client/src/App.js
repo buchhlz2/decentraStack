@@ -141,7 +141,7 @@ class App extends Component {
 				<div className='container-fluid mt-3'>
 					<Switch>
 						<Route
-							path='/feed'
+							path='/(/|feed|)/'
 							render={(props) => (
 								<ArticleFeed
 									{...props}
