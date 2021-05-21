@@ -6,7 +6,7 @@ import Sidenav from './Sidenav'
 import PublishArticleForm from './PublishArticleForm'
 import ArticleFeed from './ArticleFeed'
 import Subscriptions from './Subscriptions'
-import { Route } from 'react-router-dom'
+import { Route, Switch } from 'react-router-dom'
 
 import './App.css'
 
@@ -37,9 +37,10 @@ class App extends Component {
 			// Set web3, accounts, and contract to the state, and then proceed with an
 			// example of interacting with the contract's methods.
 			this.setState({ web3, accounts, contract: instance, ipfs }, async () => {
-				await this.getLatestArticles()
+				const articles = await this.getLatestArticles()
+				const subscribedAuthors = await this.getSubscribedAuthors()
+				this.setState({ articles, subscribedAuthors })
 			})
-			await this.getSubscribedAuthors()
 		} catch (error) {
 			// Catch any errors for any of the above operations.
 			alert(`Failed to load web3, accounts, or contract. Check console for details.`)
@@ -52,7 +53,7 @@ class App extends Component {
 		await getWeb3Click()
 	}
 
-	async getLatestArticles() {
+	getLatestArticles = async () => {
 		const latestArticles = await this.state.contract.methods.getArticles().call()
 		const articles = []
 		for await (const article of latestArticles) {
@@ -69,46 +70,8 @@ class App extends Component {
 		}
 
 		articles.reverse()
-		this.setState({ articles })
+		return articles
 	}
-
-	// OLD CODE -- do not need but keeping in case want to reference
-	/*
-	readPostFromBlockchain = async () => {
-		const post = await this.state.contract.getPastEvents('PostCreated')
-		const calculatedPostId = this.state.web3.utils.soliditySha3(
-			post[0]['returnValues']['_author'],
-			post[0]['returnValues']['_title'],
-			post[0]['returnValues']['_body'],
-			post[0]['returnValues']['_date']
-		)
-		console.log('postID from js ', calculatedPostId)
-		// TODO: query events by the `calculatedPostId` so that you can show only the post the was sent, not all events 
-        // let queryPostById = await this.state.contract.getPastEvents('PostCreated').filter({ _postId: calculatedPostId })
-		//console.log('queryPostById: ', queryPostById)
-
-		this.setState({
-			calculatedPostId,
-		})
-		console.log(post)
-		console.log('postID from blockchain ', post[0]['returnValues']['_postId'])
-
-		const stream = await this.state.ipfs.cat(post[0]['returnValues']['_body'])
-		let bodyIpfsHashToString = ''
-		for await (const chunk of stream) {
-			// chunks of data are returned as a Buffer, convert it back to a string
-			chunk.map((l) => (bodyIpfsHashToString += String.fromCharCode(l)))
-		}
-
-		this.setState({
-			blockchainDataAuthor: post[0]['returnValues']['_author'],
-			blockchainDataTitle: post[0]['returnValues']['_title'],
-			blockchainDataBodyIpfsCID: post[0]['returnValues']['_body'],
-			blockchainDataBody: bodyIpfsHashToString,
-			blockchainDataDate: post[0]['returnValues']['_date'],
-			blockchainDataPostId: post[0]['returnValues']['_postId'],
-		})
-	}*/
 
 	uploadPostToBlockchain = async (data) => {
 		const { title, body } = data
@@ -164,7 +127,7 @@ class App extends Component {
 			const authors = await contract.methods.getUserToSubscribedAuthors(user).call()
 			console.log(authors)
 
-			this.setState({ subscribedAuthors: authors })
+			return authors
 		} catch (err) {
 			console.error(err)
 		}
@@ -175,19 +138,28 @@ class App extends Component {
 			<div>
 				<Sidenav accounts={this.state.accounts} web3={this.state.web3} connectWallet={this.connectWallet} />
 				<div className='container-fluid mt-3'>
-					<Route path='/publish' component={PublishArticleForm} uploadPostToBlockchain={this.uploadPostToBlockchain} />
-					<Route path='/subscriptions' component={Subscriptions} />
-					{/* <Route
-						path='/feed'
-						component={ArticleFeed}
-						articles={this.state.articles}
-						accounts={this.state.accounts}
-						subscribeToAuthor={this.subscribeToAuthor}
-						subscribedAuthors={this.state.subscribedAuthors}
-						unsubscribeFromAuthor={this.unsubscribeFromAuthor}
-					/> */}
+					<Switch>
+						<Route
+							path='/feed'
+							render={(props) => (
+								<ArticleFeed
+									{...props}
+									articles={this.state.articles}
+									accounts={this.state.accounts}
+									subscribeToAuthor={this.subscribeToAuthor}
+									subscribedAuthors={this.state.subscribedAuthors}
+									unsubscribeFromAuthor={this.unsubscribeFromAuthor}
+								/>
+							)}
+						/>
+						<Route path='/subscriptions' component={Subscriptions} />
+						<Route
+							path='/publish'
+							render={(props) => <PublishArticleForm {...props} uploadPostToBlockchain={this.uploadPostToBlockchain} />}
+						/>
+					</Switch>
 					{/* <PublishArticleForm uploadPostToBlockchain={this.uploadPostToBlockchain} /> */}
-					{this.state.articles.length > 0 ? (
+					{/* {this.state.articles.length > 0 ? (
 						<ArticleFeed
 							articles={this.state.articles}
 							accounts={this.state.accounts}
@@ -197,7 +169,7 @@ class App extends Component {
 						/>
 					) : (
 						<div>No articles.</div>
-					)}
+					)} */}
 				</div>
 			</div>
 		)

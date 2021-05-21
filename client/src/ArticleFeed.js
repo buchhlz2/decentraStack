@@ -21,14 +21,13 @@ class ArticleFeed extends Component {
 				/>
 			)
 		})
-
 		this.setState({ articles: formatArticles })
 	}
 
 	render() {
 		return (
 			<div className='container'>
-				{this.state.articles === null ? (
+				{this.state.articles ? (
 					<div className='spinner-border' role='status'>
 						<span className='visually-hidden'>Loading...</span>
 					</div>
