@@ -1,42 +1,40 @@
-import React, { Component } from 'react'
+import React, { useState, useEffect } from 'react'
 import ArticleCard from './ArticleCard'
 
-class ArticleFeed extends Component {
-	state = {
-		articles: null,
-	}
+const ArticleFeed = (props) => {
+	const [articles, setArticles] = useState(null)
 
-	componentDidMount = () => {
+	useEffect(() => {
 		let jsxKey = 0
-		const formatArticles = this.props.articles.map((article) => {
+		const formatArticles = props.articles.map((article) => {
 			jsxKey++
 			return (
 				<ArticleCard
 					article={article}
-					accounts={this.props.accounts}
-					subscribeToAuthor={this.props.subscribeToAuthor}
-					subscribedAuthors={this.props.subscribedAuthors}
-					unsubscribeFromAuthor={this.props.unsubscribeFromAuthor}
+					accounts={props.accounts}
+					subscribeToAuthor={props.subscribeToAuthor}
+					subscribedAuthors={props.subscribedAuthors}
+					unsubscribeFromAuthor={props.unsubscribeFromAuthor}
 					key={jsxKey}
 				/>
 			)
 		})
-		this.setState({ articles: formatArticles })
-	}
+		setArticles(formatArticles)
+	}, [props])
 
-	render() {
-		return (
-			<div className='container'>
-				{this.state.articles ? (
-					<div className='spinner-border' role='status'>
+	return (
+		<div className='container'>
+			{props.isLoading ? (
+				<div className='d-flex justify-content-center' id='spinner-parent'>
+					<div className='spinner-border' role='status' style={{ width: '3rem', height: '3rem' }}>
 						<span className='visually-hidden'>Loading...</span>
 					</div>
-				) : (
-					<div>{this.state.articles}</div>
-				)}
-			</div>
-		)
-	}
+				</div>
+			) : (
+				<div>{articles}</div>
+			)}
+		</div>
+	)
 }
 
 export default ArticleFeed

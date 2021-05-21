@@ -29,6 +29,8 @@ const PublishArticleForm = (props) => {
 			console.log('Data was submitted: ' + values.title + ' ' + values.body)
 			props.uploadPostToBlockchain({ title: values.title, body: values.body })
 		}
+
+		setValues(intialState)
 	}
 
 	return (

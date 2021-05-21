@@ -66,3 +66,7 @@ body {
 	white-space: pre-wrap;
 	text-align: justify;
 }
+
+#spinner-parent {
+	margin-top: 20em;
+}

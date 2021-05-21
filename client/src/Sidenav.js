@@ -1,21 +1,10 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { Link } from 'react-router-dom'
 import WalletButton from './WalletButton'
 
 import logo from './img/logo.png'
 
-const style = {
-	normal: {
-		background: 'purple',
-		color: '#ffffff',
-	},
-	hover: {
-		background: 'red',
-	},
-}
 const Sidenav = (props) => {
-	const [hover, setHover] = useState(false)
-
 	return (
 		<nav className='navbar navbar-expand-md navbar-dark bg-primary flex-md-nowrap p-2 shadow fixed-left '>
 			<a className='navbar-brand col-sm-3 col-md-2 p-2' href='#'>

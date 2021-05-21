@@ -13,6 +13,7 @@ import './App.css'
 class App extends Component {
 	state = {
 		web3: null,
+		isLoading: false,
 		ipfs: null,
 		accounts: null,
 		contract: null,
@@ -22,6 +23,7 @@ class App extends Component {
 
 	async componentDidMount() {
 		try {
+			this.setState({ isLoading: true })
 			// Get network provider and web3 instance.
 			const web3 = await getWeb3Load()
 			const ipfs = create({ host: 'ipfs.infura.io', port: '5001', protocol: 'https' })
@@ -39,7 +41,7 @@ class App extends Component {
 			this.setState({ web3, accounts, contract: instance, ipfs }, async () => {
 				const articles = await this.getLatestArticles()
 				const subscribedAuthors = await this.getSubscribedAuthors()
-				this.setState({ articles, subscribedAuthors })
+				this.setState({ articles, subscribedAuthors, isLoading: false })
 			})
 		} catch (error) {
 			// Catch any errors for any of the above operations.
@@ -125,7 +127,6 @@ class App extends Component {
 			const user = await accounts[0]
 			console.log(`User ${user} trying to get subscribed authors`)
 			const authors = await contract.methods.getUserToSubscribedAuthors(user).call()
-			console.log(authors)
 
 			return authors
 		} catch (err) {
@@ -149,6 +150,7 @@ class App extends Component {
 									subscribeToAuthor={this.subscribeToAuthor}
 									subscribedAuthors={this.state.subscribedAuthors}
 									unsubscribeFromAuthor={this.unsubscribeFromAuthor}
+									isLoading={this.state.isLoading}
 								/>
 							)}
 						/>
