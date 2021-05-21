@@ -5,6 +5,8 @@ import { getWeb3Load, getWeb3Click } from './getWeb3'
 import Sidenav from './Sidenav'
 import PublishArticleForm from './PublishArticleForm'
 import ArticleFeed from './ArticleFeed'
+import Subscriptions from './Subscriptions'
+import { Route } from 'react-router-dom'
 
 import './App.css'
 
@@ -171,9 +173,20 @@ class App extends Component {
 	render() {
 		return (
 			<div>
-				<Sidenav accounts={this.state.accounts} web3={this.state.web3} connectWallet={this.connectWallet}/>
-				<div className='container-fluid'>
-					<PublishArticleForm uploadPostToBlockchain={this.uploadPostToBlockchain} />
+				<Sidenav accounts={this.state.accounts} web3={this.state.web3} connectWallet={this.connectWallet} />
+				<div className='container-fluid mt-3'>
+					<Route path='/publish' component={PublishArticleForm} uploadPostToBlockchain={this.uploadPostToBlockchain} />
+					<Route path='/subscriptions' component={Subscriptions} />
+					{/* <Route
+						path='/feed'
+						component={ArticleFeed}
+						articles={this.state.articles}
+						accounts={this.state.accounts}
+						subscribeToAuthor={this.subscribeToAuthor}
+						subscribedAuthors={this.state.subscribedAuthors}
+						unsubscribeFromAuthor={this.unsubscribeFromAuthor}
+					/> */}
+					{/* <PublishArticleForm uploadPostToBlockchain={this.uploadPostToBlockchain} /> */}
 					{this.state.articles.length > 0 ? (
 						<ArticleFeed
 							articles={this.state.articles}

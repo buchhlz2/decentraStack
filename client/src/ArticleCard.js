@@ -39,13 +39,12 @@ const ArticleCard = (props) => {
 								View on ipfs
 							</a>
 						</li>
-						<li className='list-inline-item mr-5'>&#8226;</li>
-
+						{/* <li className='list-inline-item mr-5'>&#8226;</li>
 						<li className='list-inline-item mr-5'>
 							<a href='#' className='card-link' target='_blank' rel='noopener noreferrer'>
 								View on etherscan
 							</a>
-						</li>
+						</li> */}
 						<li className='list-inline-item mr-5 pull-right' style={{ float: 'right' }}>
 							{props.accounts[0] === props.article.author ? (
 								''
