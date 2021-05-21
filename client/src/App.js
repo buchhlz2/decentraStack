@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import PostContract from './contracts/Post.json'
 import { create } from 'ipfs-http-client'
 import { getWeb3Load, getWeb3Click } from './getWeb3'
+import Sidenav from './Sidenav'
 import PublishArticleForm from './PublishArticleForm'
 import ArticleFeed from './ArticleFeed'
 
@@ -168,27 +169,23 @@ class App extends Component {
 	}
 
 	render() {
-		if (!this.state.web3) {
-			return (
-				<div>
-					<button onClick={this.connectWallet}>Connect Wallet</button>
-				</div>
-			)
-		}
 		return (
-			<div className='container-fluid'>
-				<PublishArticleForm uploadPostToBlockchain={this.uploadPostToBlockchain} />
-				{this.state.articles.length > 0 ? (
-					<ArticleFeed
-						articles={this.state.articles}
-						accounts={this.state.accounts}
-						subscribeToAuthor={this.subscribeToAuthor}
-						subscribedAuthors={this.state.subscribedAuthors}
-						unsubscribeFromAuthor={this.unsubscribeFromAuthor}
-					/>
-				) : (
-					<div>No articles.</div>
-				)}
+			<div>
+				<Sidenav accounts={this.state.accounts} web3={this.state.web3} connectWallet={this.connectWallet}/>
+				<div className='container-fluid'>
+					<PublishArticleForm uploadPostToBlockchain={this.uploadPostToBlockchain} />
+					{this.state.articles.length > 0 ? (
+						<ArticleFeed
+							articles={this.state.articles}
+							accounts={this.state.accounts}
+							subscribeToAuthor={this.subscribeToAuthor}
+							subscribedAuthors={this.state.subscribedAuthors}
+							unsubscribeFromAuthor={this.unsubscribeFromAuthor}
+						/>
+					) : (
+						<div>No articles.</div>
+					)}
+				</div>
 			</div>
 		)
 	}

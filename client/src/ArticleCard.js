@@ -16,7 +16,6 @@ const ArticleCard = (props) => {
 	const datetime = Number(props.article.date)
 	const options = { year: 'numeric', month: 'long', day: 'numeric' }
 	const convertedDatetime = new Date(datetime * 1000).toLocaleDateString('en', options)
-	console.log(convertedDatetime)
 
 	return (
 		<div className='card mb-3'>
