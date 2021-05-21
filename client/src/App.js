@@ -18,7 +18,7 @@ class App extends Component {
 		accounts: null,
 		contract: null,
 		articles: [],
-		subscribedAuthors: null,
+		subscribedAuthors: [],
 	}
 
 	async componentDidMount() {
@@ -154,7 +154,19 @@ class App extends Component {
 								/>
 							)}
 						/>
-						<Route path='/subscriptions' component={Subscriptions} />
+						<Route
+							path='/subscriptions'
+							render={(props) => (
+								<Subscriptions
+									{...props}
+									accounts={this.state.accounts}
+									subscribeToAuthor={this.subscribeToAuthor}
+									subscribedAuthors={this.state.subscribedAuthors}
+									unsubscribeFromAuthor={this.unsubscribeFromAuthor}
+									isLoading={this.state.isLoading}
+								/>
+							)}
+						/>
 						<Route
 							path='/publish'
 							render={(props) => <PublishArticleForm {...props} uploadPostToBlockchain={this.uploadPostToBlockchain} />}

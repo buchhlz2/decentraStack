@@ -53,7 +53,6 @@ const ArticleCard = (props) => {
 									author={props.article.author}
 									subscribeToAuthor={props.subscribeToAuthor}
 									unsubscribeFromAuthor={props.unsubscribeFromAuthor}
-									subscribedAuthors={props.subscribedAuthors}
 									isSubscribed={isSubscribed}
 								/>
 							)}
