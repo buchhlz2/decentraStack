@@ -1,10 +1,12 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { NavLink, useLocation } from 'react-router-dom'
 import WalletButton from './WalletButton'
 
 import logo from './img/logo.png'
 
 const Sidenav = (props) => {
+	const { pathname } = useLocation()
+
 	return (
 		<nav className='navbar navbar-expand-md navbar-dark bg-primary flex-md-nowrap p-2 shadow fixed-left '>
 			<a className='navbar-brand col-sm-3 col-md-2 p-2' href='#'>
@@ -26,19 +28,19 @@ const Sidenav = (props) => {
 			<div className='collapse navbar-collapse mt-3' id='navbarSupportedContent'>
 				<ul className='navbar-nav'>
 					<li className='nav-item'>
-						<Link to='/feed' className='nav-link active' aria-current='page' href='#'>
+						<NavLink to='/feed' className='nav-link' isActive={() => ['/', '/feed'].includes(pathname)} href='#'>
 							Feed
-						</Link>
+						</NavLink>
 					</li>
 					<li className='nav-item'>
-						<Link to='/subscriptions' className='nav-link' href='#'>
+						<NavLink to='/subscriptions' className='nav-link' href='#'>
 							Subscriptions
-						</Link>
+						</NavLink>
 					</li>
 					<li className='nav-item'>
-						<Link to='/publish' className='nav-link' href='#'>
+						<NavLink to='/publish' className='nav-link' href='#'>
 							Publish
-						</Link>
+						</NavLink>
 					</li>
 				</ul>
 				<ul className='navbar-nav mt-4'>
