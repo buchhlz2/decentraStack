@@ -16,6 +16,14 @@ const PublishArticleForm = (props) => {
 		})
 	}
 
+	const handleOnInputChange = (event) => {
+		const value = event.currentTarget.textContent
+		setValues({
+			...values,
+			body: value,
+		})
+	}
+
 	// TODO adjust logic to handle empty / undefined title or body being sumbitted, which is partically implemented
 	// but doesn't give UI feedback on error. Also, fix logic on uploadPostToBlockchain` such that a post is only
 	// uploaded to ipfs upon user accepting txn -- right now, data is uploaded to ipfs even if txn rejected by user
@@ -30,7 +38,8 @@ const PublishArticleForm = (props) => {
 			props.uploadPostToBlockchain({ title: values.title, body: values.body })
 		}
 
-		setValues(intialState)
+		// TODO don't reset form values until accepted by blockchain; add Uniswap/etherscan-type popup
+		// setValues(intialState)
 	}
 
 	return (
@@ -51,17 +60,18 @@ const PublishArticleForm = (props) => {
 				</div>
 				<div id='publishAreaContainer'>
 					<div className='mb-3 input-group h5'>
-						<textarea
+						<div
+							contentEditable
 							type='text'
 							name='body'
 							value={values.body}
-							onChange={handleChange}
+							onInput={handleOnInputChange}
 							className='form-control no-focus no-input-border'
 							id='publishTextarea'
 							placeholder='Write your thoughts...'
 							aria-label='Content'
 							required
-						/>
+						></div>
 					</div>
 					<button
 						type='submit'

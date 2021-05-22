@@ -5,10 +5,27 @@ body {
 #publishAreaContainer {
 	flex-direction: column;
 	flex: 1;
+	cursor: text;
+}
+
+#publishArticleFormTitle:focus::-webkit-input-placeholder {
+	color: #bdc1c9;
+}
+
+#publishTextarea:empty:before {
+	content: attr(placeholder);
+	pointer-events: none;
+	display: block;
+	color: var(--bs-gray);
+}
+
+#publishTextarea:focus:before {
+	color: #bdc1c9;
 }
 
 #publishTextarea {
 	height: 75vh;
+	overflow: scroll;
 }
 
 #spinner-parent {
@@ -92,7 +109,6 @@ body {
 
 @media (max-width: 768px) {
 	#publishTextarea {
-		background-color: red;
 		height: 63vh;
 	}
 }
