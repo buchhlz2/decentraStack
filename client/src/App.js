@@ -17,6 +17,7 @@ class App extends Component {
 	state = {
 		web3: null,
 		isLoading: true,
+		isError: false,
 		ipfs: null,
 		accounts: [],
 		contract: null,
@@ -46,15 +47,17 @@ class App extends Component {
 				this.setState({ web3, accounts, contract: instance, ipfs }, async () => {
 					const articles = await this.getLatestArticles()
 					const subscribedAuthors = await this.getSubscribedAuthors()
-					this.setState({ articles, subscribedAuthors })
+					this.setState({ articles, subscribedAuthors, isLoading: false })
 				})
+			} else {
+				this.setState({ isLoading: false })
 			}
 		} catch (error) {
 			// Catch any errors for any of the above operations.
 			alert(`Failed to load web3, accounts, or contract. Check console for details.`)
 			console.error(error)
+			this.setState({ isLoading: false, isError: true })
 		}
-		this.setState({ isLoading: false })
 	}
 
 	connectWallet = async () => {

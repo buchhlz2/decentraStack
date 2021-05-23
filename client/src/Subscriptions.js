@@ -25,13 +25,7 @@ const Subscriptions = (props) => {
 
 	return (
 		<div className='container'>
-			{props.isLoading ? (
-				<LoadingSpinner />
-			) : subscriptions.length > 0 ? (
-				<div>{subscriptions}</div>
-			) : (
-				<div>You have no subscriptions.</div>
-			)}
+			{subscriptions.length > 0 ? <div>{subscriptions}</div> : <div>You have no subscriptions.</div>}
 		</div>
 	)
 }

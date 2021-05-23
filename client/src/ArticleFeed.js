@@ -25,13 +25,7 @@ const ArticleFeed = (props) => {
 
 	return (
 		<div className='container'>
-			{props.isLoading ? (
-				<LoadingSpinner />
-			) : props.articles.length > 0 ? (
-				<div>{articles}</div>
-			) : (
-				<div>There are no new articles in your feed.</div>
-			)}
+			{props.articles.length > 0 ? <div>{articles}</div> : <div>There are no new articles in your feed.</div>}
 		</div>
 	)
 }
