@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import ArticleCard from './ArticleCard'
+import LoadingSpinner from './LoadingSpinner'
 
 const ArticleFeed = (props) => {
 	const [articles, setArticles] = useState(null)
@@ -25,13 +26,11 @@ const ArticleFeed = (props) => {
 	return (
 		<div className='container'>
 			{props.isLoading ? (
-				<div className='d-flex justify-content-center' id='spinner-parent'>
-					<div className='spinner-border' role='status' style={{ width: '3rem', height: '3rem' }}>
-						<span className='visually-hidden'>Loading...</span>
-					</div>
-				</div>
-			) : (
+				<LoadingSpinner />
+			) : props.articles.length > 0 ? (
 				<div>{articles}</div>
+			) : (
+				<div>There are no new articles in your feed.</div>
 			)}
 		</div>
 	)

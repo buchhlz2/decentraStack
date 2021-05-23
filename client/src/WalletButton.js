@@ -1,11 +1,10 @@
 import React from 'react'
-import logo from './img/logo.png'
 
 const WalletButton = (props) => {
 	return (
 		<div className='container-fluid mt-4'>
 			<ul className='navbar-nav px-3'>
-				{props.web3 ? (
+				{props.accounts.length > 0 ? (
 					<a href='#' className='btn btn-secondary btn-sm'>
 						<small>
 							<b>Wallet</b> {props.accounts[0].slice(0, 8)}...

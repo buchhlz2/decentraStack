@@ -1,11 +1,14 @@
 import React, { Component } from 'react'
 import PostContract from './contracts/Post.json'
 import { create } from 'ipfs-http-client'
-import { getWeb3Load, getWeb3Click } from './getWeb3'
+import { checkWeb3OnLoad, getWeb3Click } from './getWeb3'
 import Sidenav from './Sidenav'
 import PublishArticleForm from './PublishArticleForm'
 import ArticleFeed from './ArticleFeed'
 import Subscriptions from './Subscriptions'
+import NotFoundErrorPage from './NotFoundErrorPage'
+import NoWalletErrorPage from './NoWalletErrorPage'
+import LoadingSpinner from './LoadingSpinner'
 import { Route, Switch } from 'react-router-dom'
 
 import './App.css'
@@ -13,46 +16,56 @@ import './App.css'
 class App extends Component {
 	state = {
 		web3: null,
-		isLoading: false,
+		isLoading: true,
 		ipfs: null,
-		accounts: null,
+		accounts: [],
 		contract: null,
 		articles: [],
 		subscribedAuthors: [],
 	}
 
 	async componentDidMount() {
+		this.setState({ isLoading: true })
 		try {
-			this.setState({ isLoading: true })
 			// Get network provider and web3 instance.
-			const web3 = await getWeb3Load()
-			const ipfs = create({ host: 'ipfs.infura.io', port: '5001', protocol: 'https' })
-
-			// Use web3 to get the user's accounts.
+			const web3 = await checkWeb3OnLoad()
 			const accounts = await web3.eth.getAccounts()
+			if (accounts.length > 0) {
+				console.log(accounts)
+				const ipfs = create({ host: 'ipfs.infura.io', port: '5001', protocol: 'https' })
 
-			// Get the contract instance.
-			const networkId = await web3.eth.net.getId()
-			const deployedNetwork = PostContract.networks[networkId]
-			const instance = new web3.eth.Contract(PostContract.abi, deployedNetwork && deployedNetwork.address)
+				// Use web3 to get the user's accounts.
 
-			// Set web3, accounts, and contract to the state, and then proceed with an
-			// example of interacting with the contract's methods.
-			this.setState({ web3, accounts, contract: instance, ipfs }, async () => {
-				const articles = await this.getLatestArticles()
-				const subscribedAuthors = await this.getSubscribedAuthors()
-				this.setState({ articles, subscribedAuthors, isLoading: false })
-			})
+				// Get the contract instance.
+				const networkId = await web3.eth.net.getId()
+				const deployedNetwork = PostContract.networks[networkId]
+				const instance = new web3.eth.Contract(PostContract.abi, deployedNetwork && deployedNetwork.address)
+
+				// Set web3, accounts, and contract to the state, and then proceed with an
+				// example of interacting with the contract's methods.
+				this.setState({ web3, accounts, contract: instance, ipfs }, async () => {
+					const articles = await this.getLatestArticles()
+					const subscribedAuthors = await this.getSubscribedAuthors()
+					this.setState({ articles, subscribedAuthors })
+				})
+			}
 		} catch (error) {
 			// Catch any errors for any of the above operations.
 			alert(`Failed to load web3, accounts, or contract. Check console for details.`)
 			console.error(error)
 		}
+		this.setState({ isLoading: false })
 	}
 
 	connectWallet = async () => {
-		// TODO this needs to be fixed/refactored, along with `getWeb3Load`...better flow/usability needed
-		await getWeb3Click()
+		try {
+			const web3 = await getWeb3Click()
+			const accounts = await web3.eth.getAccounts()
+			this.setState({ web3, accounts })
+		} catch (error) {
+			alert(`Failed to load web3, accounts, or contract. Check console for details.`)
+			console.error(error)
+		}
 	}
 
 	getLatestArticles = async () => {
@@ -142,48 +155,57 @@ class App extends Component {
 					<Switch>
 						<Route
 							path='/(/|feed|)/'
-							render={(props) => (
-								<ArticleFeed
-									{...props}
-									articles={this.state.articles}
-									accounts={this.state.accounts}
-									subscribeToAuthor={this.subscribeToAuthor}
-									subscribedAuthors={this.state.subscribedAuthors}
-									unsubscribeFromAuthor={this.unsubscribeFromAuthor}
-									isLoading={this.state.isLoading}
-								/>
-							)}
+							render={(props) =>
+								this.state.isLoading ? (
+									<LoadingSpinner />
+								) : this.state.accounts.length > 0 ? (
+									<ArticleFeed
+										{...props}
+										articles={this.state.articles}
+										accounts={this.state.accounts}
+										subscribeToAuthor={this.subscribeToAuthor}
+										subscribedAuthors={this.state.subscribedAuthors}
+										unsubscribeFromAuthor={this.unsubscribeFromAuthor}
+										isLoading={this.state.isLoading}
+									/>
+								) : (
+									<NoWalletErrorPage />
+								)
+							}
 						/>
 						<Route
 							path='/subscriptions'
-							render={(props) => (
-								<Subscriptions
-									{...props}
-									accounts={this.state.accounts}
-									subscribeToAuthor={this.subscribeToAuthor}
-									subscribedAuthors={this.state.subscribedAuthors}
-									unsubscribeFromAuthor={this.unsubscribeFromAuthor}
-									isLoading={this.state.isLoading}
-								/>
-							)}
+							render={(props) =>
+								this.state.isLoading ? (
+									<LoadingSpinner />
+								) : this.state.accounts.length > 0 ? (
+									<Subscriptions
+										{...props}
+										accounts={this.state.accounts}
+										subscribeToAuthor={this.subscribeToAuthor}
+										subscribedAuthors={this.state.subscribedAuthors}
+										unsubscribeFromAuthor={this.unsubscribeFromAuthor}
+										isLoading={this.state.isLoading}
+									/>
+								) : (
+									<NoWalletErrorPage />
+								)
+							}
 						/>
 						<Route
 							path='/publish'
-							render={(props) => <PublishArticleForm {...props} uploadPostToBlockchain={this.uploadPostToBlockchain} />}
+							render={(props) =>
+								this.state.isLoading ? (
+									<LoadingSpinner />
+								) : this.state.accounts.length > 0 ? (
+									<PublishArticleForm {...props} uploadPostToBlockchain={this.uploadPostToBlockchain} />
+								) : (
+									<NoWalletErrorPage />
+								)
+							}
 						/>
+						<Route component={NotFoundErrorPage} />
 					</Switch>
-					{/* <PublishArticleForm uploadPostToBlockchain={this.uploadPostToBlockchain} /> */}
-					{/* {this.state.articles.length > 0 ? (
-						<ArticleFeed
-							articles={this.state.articles}
-							accounts={this.state.accounts}
-							subscribeToAuthor={this.subscribeToAuthor}
-							subscribedAuthors={this.state.subscribedAuthors}
-							unsubscribeFromAuthor={this.unsubscribeFromAuthor}
-						/>
-					) : (
-						<div>No articles.</div>
-					)} */}
 				</div>
 			</div>
 		)

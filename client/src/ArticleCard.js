@@ -8,7 +8,7 @@ const ArticleCard = (props) => {
 		if (props.subscribedAuthors.includes(props.article.author)) {
 			setIsSubscribed(true)
 		}
-	}, [props.subscribedAuthors, props.article.author])
+	}, [props])
 
 	// TODO create onClick logic for `View on etherscan` link to call smart contract,
 	// get article via `{props.article.postId}`. Implementation could be much into the future

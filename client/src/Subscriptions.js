@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import SubscriptionAuthorCard from './SubscriptionAuthorCard'
+import LoadingSpinner from './LoadingSpinner'
 
 const Subscriptions = (props) => {
 	const [subscriptions, setSubscriptions] = useState([])
@@ -25,11 +26,7 @@ const Subscriptions = (props) => {
 	return (
 		<div className='container'>
 			{props.isLoading ? (
-				<div className='d-flex justify-content-center' id='spinner-parent'>
-					<div className='spinner-border' role='status' style={{ width: '3rem', height: '3rem' }}>
-						<span className='visually-hidden'>Loading...</span>
-					</div>
-				</div>
+				<LoadingSpinner />
 			) : subscriptions.length > 0 ? (
 				<div>{subscriptions}</div>
 			) : (
