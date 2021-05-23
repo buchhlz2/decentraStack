@@ -26,24 +26,23 @@ class App extends Component {
 	}
 
 	async componentDidMount() {
-		this.setState({ isLoading: true })
+		this.setState({ isLoading: true, isError: false })
 		try {
-			// Get network provider and web3 instance.
+			// Use web3 to get the user's accounts -- check if user has previously authorized dapp
+			// Also, create ipfs instance
 			const web3 = await checkWeb3OnLoad()
 			const accounts = await web3.eth.getAccounts()
+			const ipfs = create({ host: 'ipfs.infura.io', port: '5001', protocol: 'https' })
+
 			if (accounts.length > 0) {
-				console.log(accounts)
-				const ipfs = create({ host: 'ipfs.infura.io', port: '5001', protocol: 'https' })
-
-				// Use web3 to get the user's accounts.
-
+				// Get network provider and web3 instance.
 				// Get the contract instance.
 				const networkId = await web3.eth.net.getId()
 				const deployedNetwork = PostContract.networks[networkId]
 				const instance = new web3.eth.Contract(PostContract.abi, deployedNetwork && deployedNetwork.address)
 
-				// Set web3, accounts, and contract to the state, and then proceed with an
-				// example of interacting with the contract's methods.
+				// Set web3, accounts, contract, and ipfs to the state
+				// Then, get latest articles and subscribed authors for the user & set state
 				this.setState({ web3, accounts, contract: instance, ipfs }, async () => {
 					const articles = await this.getLatestArticles()
 					const subscribedAuthors = await this.getSubscribedAuthors()
@@ -104,8 +103,6 @@ class App extends Component {
 	addToIpfsAndGetHash = async (data) => {
 		const ifpsObj = await this.state.ipfs.add(data)
 		const ifpsHash = await ifpsObj.path
-		console.log('ipfs uploaded file hash:')
-		console.log(ifpsHash)
 		return ifpsHash
 	}
 
@@ -141,7 +138,6 @@ class App extends Component {
 		try {
 			const { accounts, contract } = await this.state
 			const user = await accounts[0]
-			console.log(`User ${user} trying to get subscribed authors`)
 			const authors = await contract.methods.getUserToSubscribedAuthors(user).call()
 
 			return authors

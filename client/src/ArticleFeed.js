@@ -4,8 +4,10 @@ import LoadingSpinner from './LoadingSpinner'
 
 const ArticleFeed = (props) => {
 	const [articles, setArticles] = useState(null)
+	const [isLoadingArticles, setIsLoadingArticles] = useState(true)
 
 	useEffect(() => {
+		setIsLoadingArticles(true)
 		let jsxKey = 0
 		const formatArticles = props.articles.map((article) => {
 			jsxKey++
@@ -21,11 +23,18 @@ const ArticleFeed = (props) => {
 			)
 		})
 		setArticles(formatArticles)
+		setIsLoadingArticles(false)
 	}, [props])
 
 	return (
 		<div className='container'>
-			{props.articles.length > 0 ? <div>{articles}</div> : <div>There are no new articles in your feed.</div>}
+			{isLoadingArticles ? (
+				<LoadingSpinner />
+			) : props.articles.length > 0 ? (
+				<div>{articles}</div>
+			) : (
+				<div>There are no new articles in your feed.</div>
+			)}
 		</div>
 	)
 }
