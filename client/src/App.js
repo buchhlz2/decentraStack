@@ -93,14 +93,14 @@ class App extends Component {
 		const latestArticles = await this.state.contract.methods.getArticles().call()
 		const articles = []
 		for await (const article of latestArticles) {
-			const stream = await this.state.ipfs.cat(article.body)
+			const stream = await this.state.ipfs.cat(article.contentIpfsHash)
 
 			let ipfsCidToString = ''
 			for await (const chunk of stream) {
 				// chunks of data are returned as a Buffer, convert it back to a string
 				chunk.map((l) => (ipfsCidToString += String.fromCharCode(l)))
 			}
-			article.bodyContent = ipfsCidToString
+			article.content = ipfsCidToString
 
 			articles.push(article)
 		}
@@ -109,14 +109,14 @@ class App extends Component {
 		return articles
 	}
 
-	uploadPostToBlockchain = async (data) => {
-		const { title, body } = data
+	uploadArticleToBlockchain = async (data) => {
+		const { title, content } = data
 		const { accounts, contract } = this.state
 		const author = accounts[0]
 		console.log('uploading to blockchain from author: ', author)
-		const postBodyToIpfsHash = await this.addToIpfsAndGetHash(body)
-		console.log(postBodyToIpfsHash)
-		await contract.methods.createArticle(title, postBodyToIpfsHash).send({ from: author })
+		const contentToIpfsHash = await this.addToIpfsAndGetHash(content)
+		console.log(contentToIpfsHash)
+		await contract.methods.createArticle(title, contentToIpfsHash).send({ from: author })
 	}
 
 	addToIpfsAndGetHash = async (data) => {
@@ -219,7 +219,7 @@ class App extends Component {
 									this.state.isLoading ? (
 										<LoadingSpinner />
 									) : this.state.accounts.length > 0 ? (
-										<PublishArticleForm {...props} uploadPostToBlockchain={this.uploadPostToBlockchain} />
+										<PublishArticleForm {...props} uploadArticleToBlockchain={this.uploadArticleToBlockchain} />
 									) : (
 										<NoWalletErrorPage />
 									)

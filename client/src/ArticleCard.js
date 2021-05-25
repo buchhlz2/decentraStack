@@ -23,7 +23,7 @@ const ArticleCard = (props) => {
 				<h5 className='card-title'>{props.article.title}</h5>
 				<h6 className='card-subtitle mb-2 text-muted'>By {props.article.author}</h6>
 				<div className='card-text'>
-					<p>{props.article.bodyContent}</p>
+					<p>{props.article.content}</p>
 				</div>
 				<div className='card-footer mb-2'>
 					<ul className='list-inline my-auto pb-2'>
@@ -31,7 +31,7 @@ const ArticleCard = (props) => {
 						<li className='list-inline-item mr-5'>&#8226;</li>
 						<li className='list-inline-item mr-5'>
 							<a
-								href={`https://ipfs.infura.io/ipfs/${props.article.body}`}
+								href={`https://ipfs.infura.io/ipfs/${props.article.contentIpfsHash}`}
 								className='card-link'
 								target='_blank'
 								rel='noopener noreferrer'

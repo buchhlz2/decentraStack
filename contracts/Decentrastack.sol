@@ -7,16 +7,16 @@ contract Decentrastack {
   Article[] public articles;
   
   struct Article {
-    address author;
-    string title; // TODO max characters for an article title *should be* 70
-    string body; // ipfs hash of body content, to reduce storage costs
-    // ipfs hash is 46 bytes so maybe find way to byte pack via sepaarting into:
+    address author; // 20 bytes
+    string title; // TODO max characters for an article title *should be* 70 chars via UI
+    string contentIpfsHash; // ipfs hash of body content, to reduce storage costs
+    // ipfs hash is 46 bytes so maybe find way to byte pack via separating into:
     /* struct Multihash {
         bytes32 hash
         uint8 hash_function
         uint8 size
     } */
-    uint256 date; // uint32 would make max data in year 2106
+    uint256 date; // uint32 would make max date in year 2106
     bytes32 articleId; // articleId can be cheaper if just a counter instead of keccak hash
   }
 
@@ -24,25 +24,25 @@ contract Decentrastack {
   mapping(address => Article[]) public authorToArticles;
   mapping(address => address[]) public usersToSubscribedAuthors;
 
-  event ArticlePublished(address indexed _author, string _title, string indexed _body, uint256 _date, bytes32 indexed _articleId);
+  event ArticlePublished(address indexed _author, string _title, string indexed _contentIpfsHash, uint256 _date, bytes32 indexed _articleId);
   event NewUserSubscription(address indexed _follower, address indexed _author);
   event UserUnsubscribedFromAuthor(address indexed _follower, address indexed _author);
 
-  function createArticle(string memory _title, string memory _body) public {
+  function createArticle(string memory _title, string memory _content) public {
     require(bytes(_title).length > 0, "Title must have a non-empty value");
-    require(bytes(_body).length > 0, "Body content must have a non-empty value");
+    require(bytes(_content).length > 0, "Article content must have a non-empty value");
     Article memory newArticle = Article({
       author: msg.sender,
       title: _title,
-      body: _body,
+      contentIpfsHash: _content,
       date: now,
-      articleId: keccak256(abi.encodePacked(msg.sender, _title, _body, now))
+      articleId: keccak256(abi.encodePacked(msg.sender, _title, _content, now))
     });
 
     authorToArticles[msg.sender].push(newArticle);
     articles.push(newArticle);
     
-    emit ArticlePublished(newArticle.author, newArticle.title, newArticle.body, newArticle.date, newArticle.articleId);
+    emit ArticlePublished(newArticle.author, newArticle.title, newArticle.contentIpfsHash, newArticle.date, newArticle.articleId);
   }
 
   function getArticles() public view returns(Article[] memory) {
