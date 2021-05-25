@@ -2,27 +2,33 @@
 pragma solidity >=0.4.21 <0.7.0;
 pragma experimental ABIEncoderV2;
 
-contract Post {
+contract Decentrastack {
   // get all articles ever written
   Article[] public articles;
   
   struct Article {
     address author;
     string title; // TODO max characters for an article title *should be* 70
-    string body;
-    uint256 date;
-    bytes32 postId;
+    string body; // ipfs hash of body content, to reduce storage costs
+    // ipfs hash is 46 bytes so maybe find way to byte pack via sepaarting into:
+    /* struct Multihash {
+        bytes32 hash
+        uint8 hash_function
+        uint8 size
+    } */
+    uint256 date; // uint32 would make max data in year 2106
+    bytes32 articleId; // articleId can be cheaper if just a counter instead of keccak hash
   }
 
   // @dev consider adding index variable for each array; to help with lookups instead of for loop
   mapping(address => Article[]) public authorToArticles;
   mapping(address => address[]) public usersToSubscribedAuthors;
 
-  event PostCreated(address _author, string _title, string _body, uint256 _date, bytes32 _postId);
-  event NewUserSubscription(address _follower, address _author);
-  event UserUnsubscribedFromAuthor(address _follower, address _author);
+  event ArticlePublished(address indexed _author, string _title, string indexed _body, uint256 _date, bytes32 indexed _articleId);
+  event NewUserSubscription(address indexed _follower, address indexed _author);
+  event UserUnsubscribedFromAuthor(address indexed _follower, address indexed _author);
 
-  function createPost(string memory _title, string memory _body) public {
+  function createArticle(string memory _title, string memory _body) public {
     require(bytes(_title).length > 0, "Title must have a non-empty value");
     require(bytes(_body).length > 0, "Body content must have a non-empty value");
     Article memory newArticle = Article({
@@ -30,13 +36,13 @@ contract Post {
       title: _title,
       body: _body,
       date: now,
-      postId: keccak256(abi.encodePacked(msg.sender, _title, _body, now))
+      articleId: keccak256(abi.encodePacked(msg.sender, _title, _body, now))
     });
 
     authorToArticles[msg.sender].push(newArticle);
     articles.push(newArticle);
     
-    emit PostCreated(newArticle.author, newArticle.title, newArticle.body, newArticle.date, newArticle.postId);
+    emit ArticlePublished(newArticle.author, newArticle.title, newArticle.body, newArticle.date, newArticle.articleId);
   }
 
   function getArticles() public view returns(Article[] memory) {

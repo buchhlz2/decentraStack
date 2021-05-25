@@ -1,5 +1,5 @@
-const PostContract = artifacts.require('./Post.sol')
+const DecentrastackContract = artifacts.require('./Decentrastack.sol')
 
 module.exports = function (deployer) {
-	deployer.deploy(PostContract)
+	deployer.deploy(DecentrastackContract)
 }

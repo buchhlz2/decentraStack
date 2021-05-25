@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import PostContract from './contracts/Post.json'
+import DecentrastackContract from './contracts/Decentrastack.json'
 import { create } from 'ipfs-http-client'
 import { checkWeb3OnLoad, getWeb3Click } from './getWeb3'
 import Sidenav from './Sidenav'
@@ -8,6 +8,7 @@ import ArticleFeed from './ArticleFeed'
 import Subscriptions from './Subscriptions'
 import NotFoundErrorPage from './NotFoundErrorPage'
 import NoWalletErrorPage from './NoWalletErrorPage'
+import IncorrectNetworkErrorPage from './IncorrectNetworkErrorPage'
 import LoadingSpinner from './LoadingSpinner'
 import { Route, Switch } from 'react-router-dom'
 
@@ -38,8 +39,14 @@ class App extends Component {
 				// Get network provider and web3 instance.
 				// Get the contract instance.
 				const networkId = await web3.eth.net.getId()
-				const deployedNetwork = PostContract.networks[networkId]
-				const instance = new web3.eth.Contract(PostContract.abi, deployedNetwork && deployedNetwork.address)
+				// Check if networkId is either: local, (TODO -- Rinkeby, or Mainnet)
+				const checkIsValidNetwork = this.checkIsValidNetwork(networkId)
+				if (checkIsValidNetwork === false) {
+					this.setState({ isError: true })
+					return
+				}
+				const deployedNetwork = DecentrastackContract.networks[networkId]
+				const instance = new web3.eth.Contract(DecentrastackContract.abi, deployedNetwork && deployedNetwork.address)
 
 				// Set web3, accounts, contract, and ipfs to the state
 				// Then, get latest articles and subscribed authors for the user & set state
@@ -57,6 +64,18 @@ class App extends Component {
 			console.error(error)
 			this.setState({ isLoading: false, isError: true })
 		}
+	}
+
+	checkIsValidNetwork = (networkId) => {
+		let isValidNetwork = false
+		switch (networkId) {
+			case 5777:
+				isValidNetwork = true
+				break
+			default:
+				break
+		}
+		return isValidNetwork
 	}
 
 	connectWallet = async () => {
@@ -97,7 +116,7 @@ class App extends Component {
 		console.log('uploading to blockchain from author: ', author)
 		const postBodyToIpfsHash = await this.addToIpfsAndGetHash(body)
 		console.log(postBodyToIpfsHash)
-		await contract.methods.createPost(title, postBodyToIpfsHash).send({ from: author })
+		await contract.methods.createArticle(title, postBodyToIpfsHash).send({ from: author })
 	}
 
 	addToIpfsAndGetHash = async (data) => {
@@ -151,60 +170,64 @@ class App extends Component {
 			<div>
 				<Sidenav accounts={this.state.accounts} web3={this.state.web3} connectWallet={this.connectWallet} />
 				<div className='container-fluid mt-3'>
-					<Switch>
-						<Route
-							path='/(/|feed|)/'
-							render={(props) =>
-								this.state.isLoading ? (
-									<LoadingSpinner />
-								) : this.state.accounts.length > 0 ? (
-									<ArticleFeed
-										{...props}
-										articles={this.state.articles}
-										accounts={this.state.accounts}
-										subscribeToAuthor={this.subscribeToAuthor}
-										subscribedAuthors={this.state.subscribedAuthors}
-										unsubscribeFromAuthor={this.unsubscribeFromAuthor}
-										isLoading={this.state.isLoading}
-									/>
-								) : (
-									<NoWalletErrorPage />
-								)
-							}
-						/>
-						<Route
-							path='/subscriptions'
-							render={(props) =>
-								this.state.isLoading ? (
-									<LoadingSpinner />
-								) : this.state.accounts.length > 0 ? (
-									<Subscriptions
-										{...props}
-										accounts={this.state.accounts}
-										subscribeToAuthor={this.subscribeToAuthor}
-										subscribedAuthors={this.state.subscribedAuthors}
-										unsubscribeFromAuthor={this.unsubscribeFromAuthor}
-										isLoading={this.state.isLoading}
-									/>
-								) : (
-									<NoWalletErrorPage />
-								)
-							}
-						/>
-						<Route
-							path='/publish'
-							render={(props) =>
-								this.state.isLoading ? (
-									<LoadingSpinner />
-								) : this.state.accounts.length > 0 ? (
-									<PublishArticleForm {...props} uploadPostToBlockchain={this.uploadPostToBlockchain} />
-								) : (
-									<NoWalletErrorPage />
-								)
-							}
-						/>
-						<Route component={NotFoundErrorPage} />
-					</Switch>
+					{this.state.isError ? (
+						<IncorrectNetworkErrorPage />
+					) : (
+						<Switch>
+							<Route
+								path='/(/|feed|)/'
+								render={(props) =>
+									this.state.isLoading ? (
+										<LoadingSpinner />
+									) : this.state.accounts.length > 0 ? (
+										<ArticleFeed
+											{...props}
+											articles={this.state.articles}
+											accounts={this.state.accounts}
+											subscribeToAuthor={this.subscribeToAuthor}
+											subscribedAuthors={this.state.subscribedAuthors}
+											unsubscribeFromAuthor={this.unsubscribeFromAuthor}
+											isLoading={this.state.isLoading}
+										/>
+									) : (
+										<NoWalletErrorPage />
+									)
+								}
+							/>
+							<Route
+								path='/subscriptions'
+								render={(props) =>
+									this.state.isLoading ? (
+										<LoadingSpinner />
+									) : this.state.accounts.length > 0 ? (
+										<Subscriptions
+											{...props}
+											accounts={this.state.accounts}
+											subscribeToAuthor={this.subscribeToAuthor}
+											subscribedAuthors={this.state.subscribedAuthors}
+											unsubscribeFromAuthor={this.unsubscribeFromAuthor}
+											isLoading={this.state.isLoading}
+										/>
+									) : (
+										<NoWalletErrorPage />
+									)
+								}
+							/>
+							<Route
+								path='/publish'
+								render={(props) =>
+									this.state.isLoading ? (
+										<LoadingSpinner />
+									) : this.state.accounts.length > 0 ? (
+										<PublishArticleForm {...props} uploadPostToBlockchain={this.uploadPostToBlockchain} />
+									) : (
+										<NoWalletErrorPage />
+									)
+								}
+							/>
+							<Route component={NotFoundErrorPage} />
+						</Switch>
+					)}
 				</div>
 			</div>
 		)
