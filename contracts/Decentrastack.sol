@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 pragma experimental ABIEncoderV2;
 
-// import "./ArticleNFT.sol";
+import "./ArticleNFT.sol";
 
 contract Decentrastack {
   // get all articles ever written
@@ -30,15 +30,19 @@ contract Decentrastack {
   event NewUserSubscription(address indexed _follower, address indexed _author);
   event UserUnsubscribedFromAuthor(address indexed _follower, address indexed _author);
 
-  function createArticle(string memory _title, string memory _content) public {
+  function createArticle(string memory _title, string memory _contentIpfsHash) public returns(uint256 newArticleId) {
     require(bytes(_title).length > 0, "Title must have a non-empty value");
-    require(bytes(_content).length > 0, "Article content must have a non-empty value");
+    require(bytes(_contentIpfsHash).length > 0, "Article content must have a non-empty value");
+   
+    ArticleNFT newArticleNFT = new ArticleNFT();
+    newArticleId = newArticleNFT.createCollectible(msg.sender, _title, _contentIpfsHash);
+
     Article memory newArticle = Article({
       author: msg.sender,
       title: _title,
-      contentIpfsHash: _content,
+      contentIpfsHash: _contentIpfsHash,
       date: block.timestamp,
-      articleId: uint256(keccak256(abi.encodePacked(msg.sender, _title, _content, block.timestamp)))
+      articleId: newArticleId
     });
 
     authorToArticles[msg.sender].push(newArticle);
