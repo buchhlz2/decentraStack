@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.4.21 <0.7.0;
+pragma solidity ^0.8.0;
 pragma experimental ABIEncoderV2;
+
+// import "./ArticleNFT.sol";
 
 contract Decentrastack {
   // get all articles ever written
@@ -17,14 +19,14 @@ contract Decentrastack {
         uint8 size
     } */
     uint256 date; // uint32 would make max date in year 2106
-    bytes32 articleId; // articleId can be cheaper if just a counter instead of keccak hash
+    uint256 articleId; // articleId can be cheaper if just a counter instead of keccak hash
   }
 
   // @dev consider adding index variable for each array; to help with lookups instead of for loop
   mapping(address => Article[]) public authorToArticles;
   mapping(address => address[]) public usersToSubscribedAuthors;
 
-  event ArticlePublished(address indexed _author, string _title, string indexed _contentIpfsHash, uint256 _date, bytes32 indexed _articleId);
+  event ArticlePublished(address indexed _author, string _title, string indexed _contentIpfsHash, uint256 _date, uint256 indexed _articleId);
   event NewUserSubscription(address indexed _follower, address indexed _author);
   event UserUnsubscribedFromAuthor(address indexed _follower, address indexed _author);
 
@@ -35,8 +37,8 @@ contract Decentrastack {
       author: msg.sender,
       title: _title,
       contentIpfsHash: _content,
-      date: now,
-      articleId: keccak256(abi.encodePacked(msg.sender, _title, _content, now))
+      date: block.timestamp,
+      articleId: uint256(keccak256(abi.encodePacked(msg.sender, _title, _content, block.timestamp)))
     });
 
     authorToArticles[msg.sender].push(newArticle);
@@ -78,8 +80,7 @@ contract Decentrastack {
         // swap index with the last item in the array and then `delete` & shorten array
         // @dev this is to prevent 0x0 value being written to author & bloating array
         usersToSubscribedAuthors[msg.sender][i] = usersToSubscribedAuthors[msg.sender][usersToSubscribedAuthors[msg.sender].length - 1];
-        delete usersToSubscribedAuthors[msg.sender][usersToSubscribedAuthors[msg.sender].length - 1];
-        usersToSubscribedAuthors[msg.sender].length--;
+        usersToSubscribedAuthors[msg.sender].pop();
         emit UserUnsubscribedFromAuthor(msg.sender, _author);
         break;
       }
