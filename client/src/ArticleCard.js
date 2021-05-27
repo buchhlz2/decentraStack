@@ -39,6 +39,10 @@ const ArticleCard = (props) => {
 								View on ipfs
 							</a>
 						</li>
+						<li className='list-inline-item mr-5'>&#8226;</li>
+						<small>
+							<li className='list-inline-item mr-5'>{props.article.articleId}</li>
+						</small>
 						{/* <li className='list-inline-item mr-5'>&#8226;</li>
 						<li className='list-inline-item mr-5'>
 							<a href='#' className='card-link' target='_blank' rel='noopener noreferrer'>

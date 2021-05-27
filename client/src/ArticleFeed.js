@@ -19,6 +19,7 @@ const ArticleFeed = (props) => {
 					subscribedAuthors={props.subscribedAuthors}
 					unsubscribeFromAuthor={props.unsubscribeFromAuthor}
 					key={jsxKey}
+					web3={props.web3}
 				/>
 			)
 		})

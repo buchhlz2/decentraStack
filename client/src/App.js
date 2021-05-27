@@ -188,6 +188,7 @@ class App extends Component {
 											subscribedAuthors={this.state.subscribedAuthors}
 											unsubscribeFromAuthor={this.unsubscribeFromAuthor}
 											isLoading={this.state.isLoading}
+											web3={this.state.web3}
 										/>
 									) : (
 										<NoWalletErrorPage />

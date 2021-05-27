@@ -4,7 +4,7 @@ pragma experimental ABIEncoderV2;
 
 import "./ArticleNFT.sol";
 
-contract Decentrastack {
+contract Decentrastack is ArticleNFT {
   // get all articles ever written
   Article[] public articles;
   
@@ -34,8 +34,7 @@ contract Decentrastack {
     require(bytes(_title).length > 0, "Title must have a non-empty value");
     require(bytes(_contentIpfsHash).length > 0, "Article content must have a non-empty value");
    
-    ArticleNFT newArticleNFT = new ArticleNFT();
-    newArticleId = newArticleNFT.createCollectible(msg.sender, _title, _contentIpfsHash);
+    newArticleId = createCollectible(msg.sender, _title, _contentIpfsHash);
 
     Article memory newArticle = Article({
       author: msg.sender,
