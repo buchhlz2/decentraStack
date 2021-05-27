@@ -29,7 +29,6 @@ contract ArticleNFT is ERC721URIStorage, Ownable {
     _safeMint(_author, newArticleId);
     // calls ERC721URIStorage with `_contentIpfsHash` as the `tokenURI`
     _setTokenURI(newArticleId, _contentIpfsHash);
-    nftTokenIds.push(newArticleId);
     
     emit MintedArticleNFT(_author, newArticleId, _contentIpfsHash);
     return newArticleId;
