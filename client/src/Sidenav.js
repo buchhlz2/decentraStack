@@ -42,6 +42,11 @@ const Sidenav = (props) => {
 							Publish
 						</NavLink>
 					</li>
+					<li className='nav-item'>
+						<NavLink to='/collection' className='nav-link' href='#'>
+							Collection
+						</NavLink>
+					</li>
 				</ul>
 				<ul className='navbar-nav mt-4'>
 					<li>

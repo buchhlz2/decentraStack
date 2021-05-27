@@ -1,18 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import SubscribeButton from './SubscribeButton'
 
-const ArticleCard = (props) => {
-	const [isSubscribed, setIsSubscribed] = useState(false)
-
-	useEffect(() => {
-		if (props.subscribedAuthors.includes(props.article.author)) {
-			setIsSubscribed(true)
-		}
-	}, [props])
-
-	// TODO create onClick logic for `View on etherscan` link to call smart contract,
-	// get article via `{props.article.postId}`. Implementation could be much into the future
-	// when the article is an NFT, for exmaple.
+const CollectionCard = (props) => {
 	const datetime = Number(props.article.date)
 	const options = { year: 'numeric', month: 'long', day: 'numeric' }
 	const convertedDatetime = new Date(datetime * 1000).toLocaleDateString('en', options)
@@ -31,7 +19,7 @@ const ArticleCard = (props) => {
 						<li className='list-inline-item mr-5'>&#8226;</li>
 						<li className='list-inline-item mr-5'>
 							<a href={`${props.article.tokenURI}`} className='card-link' target='_blank' rel='noopener noreferrer'>
-								View on IPFS
+								View NFT URI
 							</a>
 						</li>
 						{/* <li className='list-inline-item mr-5'>&#8226;</li>
@@ -40,18 +28,6 @@ const ArticleCard = (props) => {
 								View on etherscan
 							</a>
 						</li> */}
-						<li className='list-inline-item mr-5 pull-right' style={{ float: 'right' }}>
-							{props.accounts[0] === props.article.author ? (
-								''
-							) : (
-								<SubscribeButton
-									author={props.article.author}
-									subscribeToAuthor={props.subscribeToAuthor}
-									unsubscribeFromAuthor={props.unsubscribeFromAuthor}
-									isSubscribed={isSubscribed}
-								/>
-							)}
-						</li>
 					</ul>
 				</div>
 			</div>
@@ -59,4 +35,4 @@ const ArticleCard = (props) => {
 	)
 }
 
-export default ArticleCard
+export default CollectionCard

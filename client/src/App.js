@@ -6,6 +6,7 @@ import Sidenav from './Sidenav'
 import PublishArticleForm from './PublishArticleForm'
 import ArticleFeed from './ArticleFeed'
 import Subscriptions from './Subscriptions'
+import Collection from './Collection'
 import NotFoundErrorPage from './NotFoundErrorPage'
 import NoWalletErrorPage from './NoWalletErrorPage'
 import IncorrectNetworkErrorPage from './IncorrectNetworkErrorPage'
@@ -90,10 +91,11 @@ class App extends Component {
 	}
 
 	getLatestArticles = async () => {
-		const latestArticles = await this.state.contract.methods.getArticles().call()
+		const { contract, ipfs } = this.state
+		const latestArticles = await contract.methods.getArticles().call()
 		const articles = []
 		for await (const article of latestArticles) {
-			const stream = await this.state.ipfs.cat(article.contentIpfsHash)
+			const stream = await ipfs.cat(article.contentIpfsHash)
 
 			let ipfsCidToString = ''
 			for await (const chunk of stream) {
@@ -101,6 +103,10 @@ class App extends Component {
 				chunk.map((l) => (ipfsCidToString += String.fromCharCode(l)))
 			}
 			article.content = ipfsCidToString
+
+			// call ERC721 `tokenURI` using `articleId` (called into uint256 _tokenId)
+			const tokenURI = await contract.methods.tokenURI(article.articleId).call()
+			article.tokenURI = tokenURI
 
 			articles.push(article)
 		}
@@ -221,6 +227,27 @@ class App extends Component {
 										<LoadingSpinner />
 									) : this.state.accounts.length > 0 ? (
 										<PublishArticleForm {...props} uploadArticleToBlockchain={this.uploadArticleToBlockchain} />
+									) : (
+										<NoWalletErrorPage />
+									)
+								}
+							/>
+							<Route
+								path='/collection'
+								render={(props) =>
+									this.state.isLoading ? (
+										<LoadingSpinner />
+									) : this.state.accounts.length > 0 ? (
+										<Collection
+											{...props}
+											articles={this.state.articles}
+											accounts={this.state.accounts}
+											subscribeToAuthor={this.subscribeToAuthor}
+											subscribedAuthors={this.state.subscribedAuthors}
+											unsubscribeFromAuthor={this.unsubscribeFromAuthor}
+											isLoading={this.state.isLoading}
+											web3={this.state.web3}
+										/>
 									) : (
 										<NoWalletErrorPage />
 									)
