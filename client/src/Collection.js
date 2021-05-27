@@ -10,7 +10,6 @@ const Collection = (props) => {
 		setIsLoadingArticles(true)
 		let jsxKey = 0
 		const ownedArticles = props.articles.filter((article) => article.author === props.accounts[0])
-		console.log(ownedArticles)
 		const formatArticles = ownedArticles.map((article) => {
 			jsxKey++
 			return <CollectionCard article={article} accounts={props.accounts} key={jsxKey} web3={props.web3} />
