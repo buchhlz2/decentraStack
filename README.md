@@ -6,7 +6,7 @@ Application allows a user to create articles (as unique NFTs via ipfs) and view 
 
 - Contracts on Ropsten testnet: [0x0511ad198d776Ed8D19fAf2C58E5109992f8AC73](https://ropsten.etherscan.io/address/0x0511ad198d776Ed8D19fAf2C58E5109992f8AC73)
 - Frontend hosted on ipfs: [here](https://bafybeiahvztihe3zimh7g3nxpjdived5goyt5kmgdt2mdmsih6lzc7binq.ipfs.dweb.link/)
-- Deployed by Fleek @ ipfs hash: [QmNrdob7Q92q4yGHwXM7enCtWwNqBD3iWAYYNp94i5pf5u](https://ipfs.fleek.co/ipfs/QmNrdob7Q92q4yGHwXM7enCtWwNqBD3iWAYYNp94i5pf5u/)
+- Deployed by Fleek @ ipfs hash: [QmNrdob7Q92q4yGHwXM7enCtWwNqBD3iWAYYNp94i5pf5u](https://explore.ipld.io/#/explore/QmNrdob7Q92q4yGHwXM7enCtWwNqBD3iWAYYNp94i5pf5u)
 
 ## Demo
 
