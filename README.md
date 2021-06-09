@@ -2,6 +2,11 @@
 
 Application allows a user to create articles (as unique NFTs via ipfs) and view a feed of others articles published within the decentraStack ecosystem.
 
+## Deployment
+
+- Contracts on Ropsten testnet: [0x0511ad198d776Ed8D19fAf2C58E5109992f8AC73](https://ropsten.etherscan.io/address/0x0511ad198d776Ed8D19fAf2C58E5109992f8AC73)
+- Frontend:
+
 ## Demo
 
 ![](demo/decentrastack_demo.gif)

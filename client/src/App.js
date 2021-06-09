@@ -15,6 +15,10 @@ import { Route, Switch } from 'react-router-dom'
 
 import './App.css'
 
+/**
+ * @dev Application allows users to interact with ethereum (testnet) network
+ * users can publish, subscribe/unsubscribe to/from others, and view their published articles.
+ */
 class App extends Component {
 	state = {
 		web3: null,
@@ -27,6 +31,11 @@ class App extends Component {
 		subscribedAuthors: [],
 	}
 
+	/**
+	 * @dev Upon mounting, check if web3 & connected accounts exist, otherwise, set to error.
+	 * If web3 connected properly, set state for web3, ipfs (decentralized article / NFT hosting),
+	 * and connected accounts. Then, load the latest articles & subscribed authors.
+	 */
 	async componentDidMount() {
 		this.setState({ isLoading: true, isError: false })
 		try {
@@ -67,9 +76,16 @@ class App extends Component {
 		}
 	}
 
+	/**
+	 * @dev Confirms if network is part of valid set
+	 * @param networkId `getWeb3` function will pass current web3 network ID
+	 */
 	checkIsValidNetwork = (networkId) => {
 		let isValidNetwork = false
 		switch (networkId) {
+			case 3:
+				isValidNetwork = true
+				break
 			case 5777:
 				isValidNetwork = true
 				break
@@ -79,6 +95,9 @@ class App extends Component {
 		return isValidNetwork
 	}
 
+	/**
+	 * @dev Connect to the web3 user's wallet; to be used upon click, not page loads
+	 */
 	connectWallet = async () => {
 		try {
 			const web3 = await getWeb3Click()
@@ -90,75 +109,92 @@ class App extends Component {
 		}
 	}
 
+	/**
+	 * @dev Retrieve the latest articles posted; then, convert ipfs hash to original data
+	 */
 	getLatestArticles = async () => {
 		const { contract, ipfs } = this.state
 		const latestArticles = await contract.methods.getArticles().call()
 		const articles = []
 		for await (const article of latestArticles) {
+			// Use `ipfs.cat` to convert hash to original text
 			const stream = await ipfs.cat(article.contentIpfsHash)
 
 			let ipfsCidToString = ''
 			for await (const chunk of stream) {
-				// chunks of data are returned as a Buffer, convert it back to a string
+				// Chunks of data are returned as a Buffer, convert it back to a string
 				chunk.map((l) => (ipfsCidToString += String.fromCharCode(l)))
 			}
 			article.content = ipfsCidToString
 
-			// call ERC721 `tokenURI` using `articleId` (called into uint256 _tokenId)
+			// Call ERC721 `tokenURI` using @param articleId (smart contract value: uint256 _tokenId)
 			const tokenURI = await contract.methods.tokenURI(article.articleId).call()
 			article.tokenURI = tokenURI
 
 			articles.push(article)
 		}
 
+		// @dev Reverse to have most recent articles in front of array
 		articles.reverse()
 		return articles
 	}
 
+	/**
+	 * @dev Uploads user's article to Ethereum blockchain & ipfs
+	 */
 	uploadArticleToBlockchain = async (data) => {
 		const { title, content } = data
 		const { accounts, contract } = this.state
 		const author = accounts[0]
-		console.log('uploading to blockchain from author: ', author)
+
 		const contentToIpfsHash = await this.addToIpfsAndGetHash(content)
-		console.log(contentToIpfsHash)
 		await contract.methods.createArticle(title, contentToIpfsHash).send({ from: author })
 	}
 
+	/**
+	 * @dev Add to ipfs & retrive the associated hash
+	 * @param data Article content / body only (e.g., author, title, date, etc. are NOT uploaded)
+	 * @returns ipfs 'Qm...' hash
+	 */
 	addToIpfsAndGetHash = async (data) => {
 		const ifpsObj = await this.state.ipfs.add(data)
 		const ifpsHash = await ifpsObj.path
 		return ifpsHash
 	}
 
+	/**
+	 * @dev Subscribe to an author
+	 * @param author Ethereum address of the publishing article's author
+	 */
 	subscribeToAuthor = async (author) => {
 		try {
 			const { accounts, contract } = await this.state
 			const user = await accounts[0]
-			console.log(`User ${user} trying to subscribe to author ${author}`)
+
 			await contract.methods.subscribeToAuthor(author).send({ from: user })
-			// TODO after calling, must check that it is successful; smart contract must
-			// implement this logic as well. Then, (un)subscribe btn & showing user is
-			// already subscribed to author can be rendered properly in UI
 		} catch (err) {
 			console.error(err)
 		}
 	}
 
+	/**
+	 * @dev Unsubscribe from an author
+	 * @param author Ethereum address of the publishing article's author
+	 */
 	unsubscribeFromAuthor = async (author) => {
 		try {
 			const { accounts, contract } = await this.state
 			const user = await accounts[0]
-			console.log(`User ${user} trying to unsubscribe from author ${author}`)
+
 			await contract.methods.unsubscribeFromAuthor(author).send({ from: user })
-			// TODO after calling, must check that it is successful; smart contract must
-			// implement this logic as well. Then, (un)subscribe btn & showing user is
-			// already subscribed to author can be rendered properly in UI
 		} catch (err) {
 			console.error(err)
 		}
 	}
 
+	/**
+	 * @dev Retrieve the authors in which a user has already subscribed to
+	 */
 	getSubscribedAuthors = async () => {
 		try {
 			const { accounts, contract } = await this.state
@@ -171,6 +207,12 @@ class App extends Component {
 		}
 	}
 
+	/**
+	 * @dev App consists of a sidebar nav that contains the main `ArticleFeed`, author `Subscriptions`,
+	 * a `PublishArticleForm`, and `Collection` to display authored content. If the state is currently
+	 * loading, then a `LoadingSpinner` is displayed; if there's an error, then either the `NoWalletError`,
+	 * `NotFoundErrorPage`, or `IncorrectNetworkErrorPage` page is shown.
+	 */
 	render() {
 		return (
 			<div>
