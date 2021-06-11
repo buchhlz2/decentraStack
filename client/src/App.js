@@ -148,7 +148,10 @@ class App extends Component {
 		const author = accounts[0]
 
 		const contentToIpfsHash = await this.addToIpfsAndGetHash(content)
-		await contract.methods.createArticle(title, contentToIpfsHash).send({ from: author })
+		const awaitArticleCreation = await contract.methods.createArticle(title, contentToIpfsHash).send({ from: author })
+		const txnHash = await awaitArticleCreation.transactionHash
+
+		return await txnHash
 	}
 
 	/**

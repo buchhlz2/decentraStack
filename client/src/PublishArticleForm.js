@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import WaitingForTxnConfirmation from './WaitingForTxnConfirmation'
 
 const intialState = {
 	title: '',
@@ -7,6 +8,8 @@ const intialState = {
 
 const PublishArticleForm = (props) => {
 	const [values, setValues] = useState(intialState)
+	const [isPending, setIsPending] = useState(false)
+	const [txnHash, setTxnHash] = useState(null)
 
 	const handleChange = (event) => {
 		const { name, value } = event.target
@@ -19,7 +22,8 @@ const PublishArticleForm = (props) => {
 	// TODO adjust logic to handle empty / undefined title or content being sumbitted, which is partically implemented
 	// but doesn't give UI feedback on error. Also, fix logic on `uploadArticleToBlockchain` such that a post is only
 	// uploaded to ipfs upon user accepting txn -- right now, data is uploaded to ipfs even if txn rejected by user
-	const handleSubmit = (event) => {
+	const handleSubmit = async (event) => {
+		setTxnHash(null)
 		const isEmpty = (str) => !str.trim().length
 		event.preventDefault()
 		if (
@@ -27,9 +31,17 @@ const PublishArticleForm = (props) => {
 		) {
 			console.log('error')
 			event.stopPropagation()
+			setIsPending(false)
 		} else {
+			setIsPending(true)
 			console.log('Data was submitted: ' + values.title + ' ' + values.content)
-			props.uploadArticleToBlockchain({ title: values.title, content: values.content })
+			const txnHash = await props.uploadArticleToBlockchain({
+				title: values.title,
+				content: values.content,
+			})
+			console.log(txnHash)
+			setTxnHash(txnHash)
+			setIsPending(false)
 		}
 
 		// TODO don't reset form values until accepted by blockchain; add Uniswap/etherscan-type popup
@@ -75,6 +87,7 @@ const PublishArticleForm = (props) => {
 					</button>
 				</div>
 			</form>
+            <WaitingForTxnConfirmation isPending={isPending} txnHash={txnHash} />
 		</div>
 	)
 }
