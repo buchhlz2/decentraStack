@@ -143,15 +143,21 @@ class App extends Component {
 	 * @dev Uploads user's article to Ethereum blockchain & ipfs
 	 */
 	uploadArticleToBlockchain = async (data) => {
-		const { title, content } = data
-		const { accounts, contract } = this.state
-		const author = accounts[0]
+		try {
+			const { title, content } = data
+			const { accounts, contract } = this.state
+			const author = accounts[0]
 
-		const contentToIpfsHash = await this.addToIpfsAndGetHash(content)
-		const awaitArticleCreation = await contract.methods.createArticle(title, contentToIpfsHash).send({ from: author })
-		const txnHash = await awaitArticleCreation.transactionHash
+			const contentToIpfsHash = await this.addToIpfsAndGetHash(content)
+			const awaitArticleCreation = await contract.methods.createArticle(title, contentToIpfsHash).send({ from: author })
+			const tx = await awaitArticleCreation
 
-		return await txnHash
+			return await tx
+		} catch (err) {
+			console.log('Error in attempt to post article to blockchain: ')
+			console.error(err)
+			return null
+		}
 	}
 
 	/**

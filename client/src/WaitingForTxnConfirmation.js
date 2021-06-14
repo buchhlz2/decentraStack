@@ -1,19 +1,15 @@
 import React, { useState, useEffect } from 'react'
+import TxPendingIcon from './TxPendingIcon'
 
 const WaitingForTxnConfirmation = (props) => {
-	const [txnHsh, setTxnHash] = useState(null)
-
 	return (
-		<div
-			className='position-absolute text-center'
-			style={{ zIndex: 1000, top: '40vh', backgroundColor: 'purple', width: '40vw' }}
-		>
-			<div className='card mb-3 shadow-lg'>
+		<div className='d-flex justify-content-center text-center' style={{ zIndex: 1000, marginTop: '-25em' }}>
+			<div className='card shadow-lg' style={{ width: '40%', height: '10em' }}>
 				<div className='card-body'>
-					<div>{props.isPending === true ? 'Pending' : 'Not pending'}</div>
+					<div>{props.isPending === true ? <TxPendingIcon /> : 'Not pending'}</div>
 				</div>
 				<div className='card-body'>
-					<div>{props.txnHash === null ? 'No value' : props.txnHash}</div>
+					<div>{props.txHash === null ? 'No value' : props.txHash}</div>
 				</div>
 			</div>
 		</div>
