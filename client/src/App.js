@@ -57,12 +57,13 @@ class App extends Component {
 					this.setState({ isError: true })
 					return
 				}
+				const etherscanURL = this.createEtherscanURL(networkId)
 				const deployedNetwork = DecentrastackContract.networks[networkId]
 				const instance = new web3.eth.Contract(DecentrastackContract.abi, deployedNetwork && deployedNetwork.address)
 
 				// Set web3, accounts, contract, and ipfs to the state
 				// Then, get latest articles and subscribed authors for the user & set state
-				this.setState({ web3, accounts, contract: instance, ipfs, networkId }, async () => {
+				this.setState({ web3, accounts, contract: instance, ipfs, networkId, etherscanURL }, async () => {
 					const articles = await this.getLatestArticles()
 					const subscribedAuthors = await this.getSubscribedAuthors()
 					this.setState({ articles, subscribedAuthors, isLoading: false })
@@ -87,14 +88,25 @@ class App extends Component {
 		switch (networkId) {
 			case 3:
 				isValidNetwork = true
-				this.setState({ etherscanURL: 'https://ropsten.etherscan.io' })
 				break
 			case 5777:
 				isValidNetwork = true
-				this.setState({ etherscanURL: '#' })
 				break
 		}
 		return isValidNetwork
+	}
+
+	/**
+	 * @dev Creates a proper URL to Etherscan, for viewing on-chain data
+	 * @param networkId `getWeb3` function will pass current web3 network ID
+	 */
+	createEtherscanURL = (networkId) => {
+		switch (networkId) {
+			case 3:
+				return 'https://ropsten.etherscan.io'
+			case 5777:
+				return '#'
+		}
 	}
 
 	/**

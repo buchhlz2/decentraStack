@@ -34,8 +34,8 @@ const ArticleCard = (props) => {
 								View on IPFS
 							</a>
 						</li>
-						<li className='list-inline-item mr-5'>&#8226;</li>
-						{/* <li className='list-inline-item mr-5'>
+						{/* <li className='list-inline-item mr-5'>&#8226;</li>
+						<li className='list-inline-item mr-5'>
 							<a
 								href={`${props.etherscanURL}/tx/${nftBlockchainTxId}`}
 								className='card-link'
