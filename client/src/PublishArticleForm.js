@@ -100,7 +100,13 @@ const PublishArticleForm = (props) => {
 					</button>
 				</div>
 			</form>
-			<WaitingForTxnConfirmation isError={isError} txHash={txHash} /> : ''
+			<WaitingForTxnConfirmation
+				web3={props.web3}
+				etherscanURL={props.etherscanURL}
+				isError={isError}
+				txHash={txHash}
+			/>{' '}
+			: ''
 		</div>
 	)
 }

@@ -22,6 +22,8 @@ import './App.css'
 class App extends Component {
 	state = {
 		web3: null,
+		networkId: null,
+		etherscanURL: '',
 		isLoading: true,
 		isError: false,
 		ipfs: null,
@@ -49,7 +51,7 @@ class App extends Component {
 				// Get network provider and web3 instance.
 				// Get the contract instance.
 				const networkId = await web3.eth.net.getId()
-				// Check if networkId is either: local, (TODO -- Rinkeby, or Mainnet)
+				// Check if networkId is either: local (ganache), ropsten, or (TODO Mainnet)
 				const checkIsValidNetwork = this.checkIsValidNetwork(networkId)
 				if (checkIsValidNetwork === false) {
 					this.setState({ isError: true })
@@ -60,7 +62,7 @@ class App extends Component {
 
 				// Set web3, accounts, contract, and ipfs to the state
 				// Then, get latest articles and subscribed authors for the user & set state
-				this.setState({ web3, accounts, contract: instance, ipfs }, async () => {
+				this.setState({ web3, accounts, contract: instance, ipfs, networkId }, async () => {
 					const articles = await this.getLatestArticles()
 					const subscribedAuthors = await this.getSubscribedAuthors()
 					this.setState({ articles, subscribedAuthors, isLoading: false })
@@ -85,11 +87,11 @@ class App extends Component {
 		switch (networkId) {
 			case 3:
 				isValidNetwork = true
+				this.setState({ etherscanURL: 'https://ropsten.etherscan.io' })
 				break
 			case 5777:
 				isValidNetwork = true
-				break
-			default:
+				this.setState({ etherscanURL: '#' })
 				break
 		}
 		return isValidNetwork
@@ -246,6 +248,7 @@ class App extends Component {
 											unsubscribeFromAuthor={this.unsubscribeFromAuthor}
 											isLoading={this.state.isLoading}
 											web3={this.state.web3}
+											etherscanURL={this.state.etherscanURL}
 										/>
 									) : (
 										<NoWalletErrorPage />
@@ -277,7 +280,12 @@ class App extends Component {
 									this.state.isLoading ? (
 										<LoadingSpinner />
 									) : this.state.accounts.length > 0 ? (
-										<PublishArticleForm {...props} uploadArticleToBlockchain={this.uploadArticleToBlockchain} />
+										<PublishArticleForm
+											{...props}
+											uploadArticleToBlockchain={this.uploadArticleToBlockchain}
+											web3={this.state.web3}
+											etherscanURL={this.state.etherscanURL}
+										/>
 									) : (
 										<NoWalletErrorPage />
 									)
