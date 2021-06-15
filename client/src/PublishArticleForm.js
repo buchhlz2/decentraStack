@@ -93,12 +93,14 @@ const PublishArticleForm = (props) => {
 						type='submit'
 						className='btn btn-primary no-focus'
 						style={{ alignSelf: 'flex-end', position: 'absolute', bottom: 35 }}
+						data-bs-toggle='modal'
+						data-bs-target='#confirmationModal'
 					>
 						Publish
 					</button>
 				</div>
 			</form>
-			<WaitingForTxnConfirmation isPending={isPending} txHash={txHash} />
+			<WaitingForTxnConfirmation isError={isError} txHash={txHash} /> : ''
 		</div>
 	)
 }

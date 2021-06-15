@@ -21,6 +21,11 @@ body {
 	overflow: scroll;
 }
 
+.modal-backdrop {
+	/* bug fix - no overlay */
+	display: none;
+}
+
 #spinner-parent {
 	margin-top: 20em;
 }
