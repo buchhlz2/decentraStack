@@ -8,11 +8,8 @@ const intialState = {
 
 const PublishArticleForm = (props) => {
 	const [values, setValues] = useState(intialState)
-	const [isPending, setIsPending] = useState(false)
 	const [isError, setIsError] = useState(false)
 	const [txHash, setTxHash] = useState(null)
-
-	useEffect(() => {})
 
 	const handleChange = (event) => {
 		const { name, value } = event.target
@@ -22,23 +19,17 @@ const PublishArticleForm = (props) => {
 		})
 	}
 
-	// TODO adjust logic to handle empty / undefined title or content being sumbitted, which is partically implemented
-	// but doesn't give UI feedback on error. Also, fix logic on `uploadArticleToBlockchain` such that a post is only
-	// uploaded to ipfs upon user accepting txn -- right now, data is uploaded to ipfs even if txn rejected by user
 	const handleSubmit = async (event) => {
 		setTxHash(null)
-		setIsPending(false)
 		setIsError(false)
 		const isEmpty = (str) => !str.trim().length
 		event.preventDefault()
 		if (
 			(values.title === undefined || isEmpty(values.title), values.content === undefined || isEmpty(values.content))
 		) {
-			console.log('is format error')
 			setIsError(true)
 			event.stopPropagation()
 		} else {
-			setIsPending(true)
 			console.log('Data was submitted: ' + values.title + ' ' + values.content)
 			const tx = await props.uploadArticleToBlockchain({
 				title: values.title,
@@ -46,17 +37,11 @@ const PublishArticleForm = (props) => {
 			})
 			if ((await tx) != null) {
 				const txHash = await tx.transactionHash
-				console.log(tx)
 				setTxHash(txHash)
 			} else {
-				console.log('is txn error')
 				setIsError(true)
 			}
-			setIsPending(false)
 		}
-
-		// TODO don't reset form values until accepted by blockchain; add Uniswap/etherscan-type popup
-		// setValues(intialState)
 	}
 
 	return (

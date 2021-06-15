@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 
 const CollectionCard = (props) => {
 	const datetime = Number(props.article.date)
@@ -22,12 +22,17 @@ const CollectionCard = (props) => {
 								View NFT URI
 							</a>
 						</li>
-						{/* <li className='list-inline-item mr-5'>&#8226;</li>
+						<li className='list-inline-item mr-5'>&#8226;</li>
 						<li className='list-inline-item mr-5'>
-							<a href={`https://etherscan.io/tx/${nftBlockchainTxId}`} className='card-link' target='_blank' rel='noopener noreferrer'>
-								View on etherscan
+							<a
+								href={`${props.etherscanURL}/token/${props.contract._address}?a=${props.article.articleId}`}
+								className='card-link'
+								target='_blank'
+								rel='noopener noreferrer'
+							>
+								View on Etherscan
 							</a>
-						</li> */}
+						</li>
 					</ul>
 				</div>
 			</div>

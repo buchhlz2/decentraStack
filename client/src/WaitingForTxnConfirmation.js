@@ -40,7 +40,7 @@ const WaitingForTxnConfirmation = (props) => {
 										target='_blank'
 										rel='noopener noreferrer'
 									>
-										View on etherscan
+										View on Etherscan
 									</a>
 								)}
 							</div>

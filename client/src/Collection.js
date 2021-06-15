@@ -12,7 +12,16 @@ const Collection = (props) => {
 		const ownedArticles = props.articles.filter((article) => article.author === props.accounts[0])
 		const formatArticles = ownedArticles.map((article) => {
 			jsxKey++
-			return <CollectionCard article={article} accounts={props.accounts} key={jsxKey} web3={props.web3} />
+			return (
+				<CollectionCard
+					article={article}
+					accounts={props.accounts}
+					key={jsxKey}
+					web3={props.web3}
+					contract={props.contract}
+					etherscanURL={props.etherscanURL}
+				/>
+			)
 		})
 		setArticles(formatArticles)
 		setIsLoadingArticles(false)

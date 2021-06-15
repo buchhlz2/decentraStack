@@ -318,6 +318,8 @@ class App extends Component {
 											unsubscribeFromAuthor={this.unsubscribeFromAuthor}
 											isLoading={this.state.isLoading}
 											web3={this.state.web3}
+											contract={this.state.contract}
+											etherscanURL={this.state.etherscanURL}
 										/>
 									) : (
 										<NoWalletErrorPage />
