@@ -8,7 +8,7 @@ Application allows a user to create articles (as unique NFTs via ipfs) and view 
 - Frontend hosted on IPFS (deployed via Fleek): [ipfs](https://bafybeic4qfxuziehkq4uqvg7a4pdwluwtj4qgveaxkxl3hznzsn2ihjvsi.ipfs.dweb.link/) or [fleek domain](https://silent-frost-5466.on.fleek.co)
 - View on IPLD @ IPFS CID: [QmUZkh1512Qu8zTfGufzosvzwDsuTynKX26DwxiYHmzdRj](https://explore.ipld.io/#/explore/QmUZkh1512Qu8zTfGufzosvzwDsuTynKX26DwxiYHmzdRj)
 
-Note: when interacting with the frontend, a page refresh may be required (e.g., after connecting wallet and then swithing to the Ropsten testnet)
+Note: when interacting with the frontend, a page refresh may be required (e.g., after connecting wallet and then switching to the Ropsten testnet)
 
 ## Demo
 
