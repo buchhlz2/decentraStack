@@ -5,8 +5,10 @@ Application allows a user to create articles (as unique NFTs via ipfs) and view 
 ## Deployment
 
 - Contracts on Ropsten testnet: [0x0511ad198d776Ed8D19fAf2C58E5109992f8AC73](https://ropsten.etherscan.io/address/0x0511ad198d776Ed8D19fAf2C58E5109992f8AC73)
-- Frontend hosted on ipfs: [here](https://bafybeiahvztihe3zimh7g3nxpjdived5goyt5kmgdt2mdmsih6lzc7binq.ipfs.dweb.link/)
-- Deployed by Fleek @ ipfs hash: [QmNrdob7Q92q4yGHwXM7enCtWwNqBD3iWAYYNp94i5pf5u](https://explore.ipld.io/#/explore/QmNrdob7Q92q4yGHwXM7enCtWwNqBD3iWAYYNp94i5pf5u)
+- Frontend hosted on IPFS (deployed via Fleek): [ipfs](https://bafybeic4qfxuziehkq4uqvg7a4pdwluwtj4qgveaxkxl3hznzsn2ihjvsi.ipfs.dweb.link/) or [fleek domain](https://silent-frost-5466.on.fleek.co)
+- View on IPLD @ IPFS CID: [QmUZkh1512Qu8zTfGufzosvzwDsuTynKX26DwxiYHmzdRj](https://explore.ipld.io/#/explore/QmUZkh1512Qu8zTfGufzosvzwDsuTynKX26DwxiYHmzdRj)
+
+Note: when interacting with the frontend, a page refresh may be required (e.g., after connecting wallet and then swithing to the Ropsten testnet)
 
 ## Demo
 
@@ -15,7 +17,7 @@ Application allows a user to create articles (as unique NFTs via ipfs) and view 
 ## Smart Contract Details
 
 - `Decentrastack` -- allows users to publish, subscribe/unsubscribe to/from other publishers, & view articles published by the user
-- `ArticleNFT` -- inherits from OpenZeppelin ERC721 specification; creates NFT as an article, as part of the decentraStack "DSTK" collection, onto the ipfs network
+- `ArticleNFT` -- inherits from OpenZeppelin ERC721 specification; creates article as an NFT, as part of the decentraStack "DSTK" collection, where a susbset of data is saved pinned to the IPFS network
 
 ## Available Scripts
 
